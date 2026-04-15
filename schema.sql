@@ -74,11 +74,13 @@ CREATE TABLE attachments (
 INSERT INTO sections (name, emoji, slug) VALUES 
 ('Contracts', '📄', 'contracts'),
 ('Prices', '💰', 'prices'),
-('Analysis Conditions', '🧪', 'analysis-conditions'),
-('Analysis Shortcuts', '🔬', 'analysis-shortcuts'),
-('Problem Solving', '🔧', 'problem-solving'),
+('Analysis Conditions', '🧪', 'conditions'),
+('Analysis Shortcuts', '🔬', 'shortcuts'),
+('Problem Solving', '🔧', 'problems'),
 ('Application', '📱', 'application'),
-('Diagnoses', '🏥', 'diagnoses');
+('Diagnoses', '🏥', 'diagnoses'),
+('Question Bank', '❓', 'questions'),
+('Applications Section', '📂', 'applications_section');
 
 -- Insert Demo Admin
 INSERT INTO users (username, password, role, display_name)

@@ -12,6 +12,7 @@ import './lib/i18n';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
+import MigrationPage from './pages/MigrationPage';
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -41,6 +42,16 @@ export default function App() {
 
   if (!user) {
     return <Login />;
+  }
+
+  // Simple routing for migration page
+  if (window.location.pathname === '/migrate') {
+    if (user.role === 'admin') {
+      return <MigrationPage />;
+    } else {
+      window.location.href = '/';
+      return null;
+    }
   }
 
   return user.role === 'admin' ? <AdminDashboard /> : <UserDashboard />;

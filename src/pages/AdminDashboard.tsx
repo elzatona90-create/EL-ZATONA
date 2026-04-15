@@ -27,7 +27,8 @@ import {
   Star,
   Search as SearchIcon,
   TrendingUp,
-  History
+  History,
+  Database
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -92,6 +93,24 @@ export default function AdminDashboard() {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({ username: '', password: '', role: 'user' as const });
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    });
+  }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
   
   // Prices Calculator State
   const [calcAnalysis, setCalcAnalysis] = useState('');
@@ -122,6 +141,9 @@ export default function AdminDashboard() {
   // Global Search State
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [globalSearchResults, setGlobalSearchResults] = useState<any[]>([]);
+
+  // Section Search State
+  const [sectionSearchQuery, setSectionSearchQuery] = useState('');
 
   // Attachment Search
   const [attachmentSearch, setAttachmentSearch] = useState('');
@@ -196,7 +218,7 @@ export default function AdminDashboard() {
         .from('attachments')
         .getPublicUrl(fileName);
 
-      await addAttachment(file.name, publicUrl, file.size);
+      await addAttachment(newItem.title || file.name, publicUrl, file.size, editingItem || undefined, selectedSection || undefined);
       setNewItem({...newItem, attachment_url: publicUrl});
     } catch (error) {
       console.error('Upload error:', error);
@@ -211,14 +233,26 @@ export default function AdminDashboard() {
       setGlobalSearchResults([]);
       return;
     }
-    const results = items.filter(item => 
+    const itemResults = items.filter(item => 
       item.title.toLowerCase().includes(query.toLowerCase()) || 
       item.description?.toLowerCase().includes(query.toLowerCase())
     ).map(item => ({
       ...item,
       section: sections.find(s => s.id === item.section_id)
     }));
-    setGlobalSearchResults(results);
+
+    const priceResults = prices.filter(p => 
+      p.analysis_name.toLowerCase().includes(query.toLowerCase()) ||
+      p.company_name.toLowerCase().includes(query.toLowerCase())
+    ).map(p => ({
+      id: p.id,
+      title: p.analysis_name,
+      description: `${p.company_name} | ${p.contract_type} | Price: ${p.price}`,
+      section_id: sections.find(s => s.slug === 'prices')?.id,
+      section: sections.find(s => s.slug === 'prices')
+    }));
+
+    setGlobalSearchResults([...itemResults, ...priceResults]);
   };
 
 
@@ -347,17 +381,34 @@ export default function AdminDashboard() {
 
             <div className="space-y-6">
               {globalSearchResults.map((item) => (
-                <div key={item.id} className="glass-morphism rounded-[32px] p-8 border-l-8 border-neon-magenta relative group">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <p className="text-[10px] font-black text-neon-magenta tracking-widest uppercase mb-1">
-                        {item.section?.name}
+                <div 
+                  key={item.id} 
+                  className="item-card-vertical cursor-pointer group"
+                  onClick={() => {
+                    setSelectedSection(item.section_id);
+                    setActiveTab('sections');
+                  }}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
+                        {item.section?.emoji} {item.section?.title || item.section?.name}
                       </p>
-                      <h4 className="text-xl font-black">{item.title}</h4>
+                      <h4 className="text-xl font-black text-white">{item.title}</h4>
                     </div>
                     <div className="flex gap-2">
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(item.id);
+                        }}
+                        className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
+                      >
+                        <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedSection(item.section_id);
                           setEditingItem(item.id);
                           setNewItem({
@@ -375,7 +426,22 @@ export default function AdminDashboard() {
                       </button>
                     </div>
                   </div>
-                  <p className="text-gray-400 text-sm line-clamp-2">{item.description}</p>
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
+                    <div className="space-y-1">
+                      {item.description?.split('\n').map((line: string, i: number) => (
+                        <p key={i} className="description-text">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                  {item.attachment_url && (
+                    <div className="flex items-center gap-2 text-neon-cyan text-[10px] font-black uppercase tracking-widest">
+                      <Paperclip className="w-4 h-4" />
+                      Has Attachment
+                    </div>
+                  )}
                 </div>
               ))}
               {globalSearchQuery && globalSearchResults.length === 0 && (
@@ -516,17 +582,32 @@ export default function AdminDashboard() {
               <div className="space-y-8">
                 <div className="flex justify-between items-center">
                   <button 
-                    onClick={() => setSelectedSection(null)}
+                    onClick={() => {
+                      setSelectedSection(null);
+                      setSectionSearchQuery('');
+                    }}
                     className="flex items-center gap-2 text-neon-cyan font-bold uppercase tracking-widest text-xs"
                   >
                     <ArrowLeft className="w-4 h-4" /> {t('back_to_sections')}
                   </button>
-                  <button 
-                    onClick={() => setIsAddingItem(true)}
-                    className="p-3 bg-neon-magenta/20 rounded-xl text-neon-magenta hover:bg-neon-magenta/30 transition-all"
-                  >
-                    <Plus className="w-6 h-6" />
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input 
+                        type="text"
+                        value={sectionSearchQuery}
+                        onChange={(e) => setSectionSearchQuery(e.target.value)}
+                        placeholder="Search in section..."
+                        className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:border-neon-cyan outline-none transition-all"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => setIsAddingItem(true)}
+                      className="p-3 bg-neon-magenta/20 rounded-xl text-neon-magenta hover:bg-neon-magenta/30 transition-all"
+                    >
+                      <Plus className="w-6 h-6" />
+                    </button>
+                  </div>
                 </div>
 
                 <h3 className="text-3xl font-black neon-text-cyan flex items-center gap-4">
@@ -806,15 +887,21 @@ export default function AdminDashboard() {
                         />
 
                         <div className="space-y-2">
-                          <p className="text-[10px] font-black text-gray-500 tracking-widest uppercase">Attachment URL</p>
+                          <p className="text-[10px] font-black text-gray-500 tracking-widest uppercase">Attachment (Image or PDF)</p>
                           <div className="flex gap-2">
-                            <input 
-                              type="text"
-                              value={newItem.attachment_url}
-                              onChange={(e) => setNewItem({...newItem, attachment_url: e.target.value})}
-                              placeholder="https://..."
-                              className="flex-1 bg-white/5 border-2 border-white/10 rounded-xl px-4 py-2 focus:outline-none focus:border-neon-cyan transition-all"
-                            />
+                            <label className="flex-1 bg-white/5 border-2 border-white/10 rounded-xl px-4 py-2 hover:border-neon-cyan transition-all cursor-pointer flex items-center justify-between">
+                              <span className="text-gray-400 truncate">
+                                {isUploading ? 'Uploading...' : (newItem.attachment_url ? 'File Selected' : 'Choose File...')}
+                              </span>
+                              <Upload className={`w-5 h-5 text-neon-cyan ${isUploading ? 'animate-bounce' : ''}`} />
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*,.pdf,.doc,.docx"
+                                onChange={handleItemAttachmentUpload} 
+                                disabled={isUploading} 
+                              />
+                            </label>
                             <select 
                               onChange={(e) => setNewItem({...newItem, attachment_url: e.target.value})}
                               className="bg-white/5 border-2 border-white/10 rounded-xl px-2 py-2 text-xs focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white pr-8"
@@ -838,12 +925,18 @@ export default function AdminDashboard() {
                     )}
 
                     <div className="space-y-6">
-                      {items.filter(i => i.section_id === selectedSection).map((item) => (
-                        <div key={item.id} className="glass-morphism rounded-[32px] p-8 border-l-8 border-neon-cyan relative group">
-                          <div className="absolute right-6 top-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      {items
+                        .filter(i => i.section_id === selectedSection)
+                        .filter(i => 
+                          i.title.toLowerCase().includes(sectionSearchQuery.toLowerCase()) || 
+                          i.description?.toLowerCase().includes(sectionSearchQuery.toLowerCase())
+                        )
+                        .map((item) => (
+                        <div key={item.id} className="item-card-vertical group">
+                          <div className="absolute right-6 top-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10">
                             <button 
                               onClick={() => toggleFavorite(item.id)}
-                              className={`p-2 rounded-xl border transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'bg-neon-magenta/20 border-neon-magenta text-neon-magenta' : 'bg-white/5 border-white/10 text-gray-500'}`}
+                              className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
                             >
                               <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
                             </button>
@@ -869,22 +962,50 @@ export default function AdminDashboard() {
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
+                          
                           <div className="space-y-4">
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="text-[10px] font-black text-neon-cyan tracking-widest uppercase mb-1">NAME</p>
-                                <h4 className="text-xl font-black">{item.title}</h4>
+                                <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-1">NAME</p>
+                                <div className="inline-block bg-neon-cyan/10 px-4 py-1.5 rounded-lg border border-neon-cyan/20">
+                                  <h4 className="text-lg font-bold text-neon-cyan">{item.title}</h4>
+                                </div>
                               </div>
-                              {item.category && (
-                                <span className="px-3 py-1 bg-neon-cyan/10 text-neon-cyan text-[10px] font-black rounded-full uppercase tracking-widest">
+                            </div>
+
+                            <div>
+                              <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
+                              <div className="space-y-1">
+                                {item.description?.split('\n').map((line: string, i: number) => (
+                                  <p key={i} className="description-text">
+                                    {line}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+
+                            {item.category && (
+                              <div className="pt-2">
+                                <span className="inline-block bg-[#001233] text-neon-cyan text-xs font-bold px-3 py-1 rounded-md border border-neon-cyan/20">
                                   {item.category}
                                 </span>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-[10px] font-black text-neon-cyan tracking-widest uppercase mb-1">DESCRIPTION</p>
-                              <p className="text-gray-300">{item.description}</p>
-                            </div>
+                              </div>
+                            )}
+
+                            {item.attachment_url && (
+                              <div className="pt-2">
+                                <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
+                                <a 
+                                  href={item.attachment_url} 
+                                  target="_blank" 
+                                  rel="noreferrer"
+                                  className="inline-flex items-center gap-2 bg-neon-cyan/10 text-neon-cyan font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-cyan/20 transition-all"
+                                >
+                                  <Paperclip className="w-4 h-4" />
+                                  {t('view_attachment')}
+                                </a>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -914,15 +1035,15 @@ export default function AdminDashboard() {
 
             <div className="space-y-6">
               {items.filter(i => favorites.some(f => f.item_id === i.id && f.user_id === user?.id)).map((item) => (
-                <div key={item.id} className="glass-morphism rounded-[32px] p-8 border-l-[12px] border-neon-magenta relative overflow-hidden">
-                  <div className="space-y-6">
+                <div key={item.id} className="glass-morphism-magenta rounded-2xl p-6 relative overflow-hidden">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-3">
+                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-1">
                           {sections.find(s => s.id === item.section_id)?.name}
                         </p>
-                        <div className="inline-block glass-morphism bg-neon-magenta/20 px-8 py-3 rounded-2xl border border-neon-magenta/40">
-                          <h4 className="text-2xl font-black text-white">{item.title}</h4>
+                        <div className="inline-block bg-neon-magenta/10 px-4 py-1.5 rounded-lg border border-neon-magenta/20">
+                          <h4 className="text-lg font-bold text-neon-magenta">{item.title}</h4>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -939,17 +1060,44 @@ export default function AdminDashboard() {
                             });
                             setActiveTab('sections');
                           }}
-                          className="p-3 bg-neon-cyan/20 rounded-2xl text-neon-cyan"
+                          className="p-2 bg-neon-cyan/10 rounded-xl text-neon-cyan hover:bg-neon-cyan/20 transition-all"
                         >
-                          <Edit className="w-6 h-6" />
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button 
+                          onClick={() => toggleFavorite(item.id)}
+                          className="p-2 rounded-xl transition-all text-neon-magenta hover:bg-white/5"
+                        >
+                          <Star className="w-5 h-5 fill-current" />
                         </button>
                       </div>
                     </div>
 
                     <div>
-                      <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-3">DESCRIPTION</p>
-                      <p className="text-lg font-bold leading-relaxed text-gray-100">{item.description}</p>
+                      <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
+                      <div className="space-y-1">
+                        {item.description?.split('\n').map((line: string, i: number) => (
+                          <p key={i} className="text-sm font-medium leading-relaxed text-gray-200">
+                            {line}
+                          </p>
+                        ))}
+                      </div>
                     </div>
+
+                    {item.attachment_url && (
+                      <div className="pt-2">
+                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
+                        <a 
+                          href={item.attachment_url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 bg-neon-magenta/10 text-neon-magenta font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-magenta/20 transition-all"
+                        >
+                          <Paperclip className="w-4 h-4" />
+                          {t('view_attachment')}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1006,9 +1154,16 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <h4 className="text-xl font-black truncate max-w-[200px]">{file.name}</h4>
-                      <p className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">
-                        {(file.size / 1024).toFixed(1)} KB | {new Date(file.created_at).toLocaleDateString()}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">
+                          {(file.size / 1024).toFixed(1)} KB | {new Date(file.created_at).toLocaleDateString()}
+                        </p>
+                        {file.section_id && (
+                          <span className="text-[8px] font-black text-neon-cyan tracking-widest uppercase bg-neon-cyan/10 px-2 py-0.5 rounded">
+                            {sections.find(s => s.id === file.section_id)?.emoji} {sections.find(s => s.id === file.section_id)?.title || sections.find(s => s.id === file.section_id)?.name}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -1169,6 +1324,21 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {deferredPrompt && (
+              <div className="glass-morphism p-8 rounded-[32px] space-y-6">
+                <h4 className="text-xl font-black flex items-center gap-3">
+                  <Settings className="w-6 h-6 text-neon-cyan" />
+                  Download App
+                </h4>
+                <button 
+                  onClick={handleInstall}
+                  className="w-full bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 font-black py-4 rounded-xl uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+                >
+                  Install Application
+                </button>
+              </div>
+            )}
+
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
                 <Users className="w-6 h-6 text-neon-cyan" />
@@ -1263,6 +1433,22 @@ export default function AdminDashboard() {
 
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
+                <Database className="w-6 h-6 text-neon-cyan" />
+                Data Migration
+              </h4>
+              <p className="text-gray-400 text-sm font-medium">
+                Migrate legacy data from Firebase to Supabase. This is a one-time operation.
+              </p>
+              <button 
+                onClick={() => window.location.href = '/migrate'}
+                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
+              >
+                <Database className="w-4 h-4" /> Go to Migration Page
+              </button>
+            </div>
+
+            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
+              <h4 className="text-xl font-black flex items-center gap-3">
                 <Palette className="w-6 h-6 text-neon-magenta" />
                 {t('theme')}
               </h4>
@@ -1277,6 +1463,22 @@ export default function AdminDashboard() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
+              <h4 className="text-xl font-black flex items-center gap-3">
+                <Database className="w-6 h-6 text-neon-cyan" />
+                Data Migration
+              </h4>
+              <p className="text-gray-400 text-sm font-medium">
+                Migrate data from the legacy Firebase database to the new Supabase database.
+              </p>
+              <button 
+                onClick={() => window.location.href = '/migrate'}
+                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan font-black py-4 rounded-xl uppercase tracking-widest text-xs hover:bg-neon-cyan/10 transition-all flex items-center justify-center gap-2"
+              >
+                <Database className="w-4 h-4" /> Go to Migration Page
+              </button>
             </div>
           </motion.div>
         )}

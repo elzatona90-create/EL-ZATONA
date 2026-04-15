@@ -59,8 +59,8 @@ export default function Login() {
       >
         {/* Logo Section */}
         <div className="mb-12 relative">
-          <div className="w-40 h-40 rounded-[40px] overflow-hidden border-4 border-neon-magenta neon-glow-magenta p-1 bg-gradient-to-br from-neon-magenta to-neon-cyan">
-            <div className="w-full h-full rounded-[36px] overflow-hidden bg-dark-bg flex items-center justify-center">
+          <div className="w-28 h-28 rounded-[28px] overflow-hidden border-4 border-neon-magenta neon-glow-magenta p-1 bg-gradient-to-br from-neon-magenta to-neon-cyan">
+            <div className="w-full h-full rounded-[24px] overflow-hidden bg-dark-bg flex items-center justify-center">
               {!imgError ? (
                 <img 
                   src={BRANDING.logo_url} 
@@ -70,7 +70,7 @@ export default function Login() {
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <Brain className="w-24 h-24 text-neon-cyan" />
+                <Brain className="w-16 h-16 text-neon-cyan" />
               )}
             </div>
           </div>
@@ -78,8 +78,8 @@ export default function Login() {
 
         {/* App Name Section */}
         <div className="text-center mb-12 w-full">
-          <div className="inline-block glass-morphism px-6 py-2 rounded-full border border-neon-cyan mb-6 neon-glow-cyan shadow-[0_0_30px_rgba(0,168,255,0.6)]">
-            <h1 className="text-xl md:text-2xl font-black neon-text-cyan tracking-widest whitespace-nowrap">
+          <div className="inline-block glass-morphism px-8 py-3 rounded-full border border-neon-cyan mb-6 neon-glow-cyan shadow-[0_0_30px_rgba(0,168,255,0.6)]">
+            <h1 className="text-3xl md:text-4xl font-black neon-text-cyan tracking-widest whitespace-nowrap">
               {t('app_name')}
             </h1>
           </div>

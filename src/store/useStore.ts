@@ -46,7 +46,7 @@ interface AppState {
   syncSearchLogs: () => Promise<void>;
 
   // Attachments
-  addAttachment: (name: string, url: string, size: number) => Promise<void>;
+  addAttachment: (name: string, url: string, size: number, item_id?: string, section_id?: string) => Promise<void>;
   deleteAttachment: (id: string) => Promise<void>;
 
   // Users
@@ -67,12 +67,12 @@ let searchLogQueue: { term: string; section?: string; user_id?: string }[] = [];
 export const useStore = create<AppState>((set, get) => ({
   user: JSON.parse(localStorage.getItem('el_zatona_user') || 'null'),
   sections: JSON.parse(localStorage.getItem('el_zatona_sections') || '[]'),
-  items: JSON.parse(localStorage.getItem('el_zatona_items') || '[]'),
-  prices: JSON.parse(localStorage.getItem('el_zatona_prices') || '[]'),
+  items: [], // Don't load large datasets from localStorage
+  prices: [],
   favorites: JSON.parse(localStorage.getItem('el_zatona_favorites') || '[]'),
-  searchLogs: JSON.parse(localStorage.getItem('el_zatona_search_logs') || '[]'),
-  attachments: JSON.parse(localStorage.getItem('el_zatona_attachments') || '[]'),
-  users: JSON.parse(localStorage.getItem('el_zatona_users') || '[]'),
+  searchLogs: [],
+  attachments: [],
+  users: [],
   lastFetch: Number(localStorage.getItem('el_zatona_last_fetch') || '0'),
   theme: (localStorage.getItem('el_zatona_theme') as any) || 'teal',
   language: (localStorage.getItem('el_zatona_lang') as any) || 'en',
@@ -123,11 +123,6 @@ export const useStore = create<AppState>((set, get) => ({
         await supabase.from('sections').insert(initialSections);
       }
 
-      if (isPlaceholder) {
-        console.log("Supabase is in placeholder mode, skipping fetch to preserve local data.");
-        return;
-      }
-
       const [
         { data: sections },
         { data: items },
@@ -158,10 +153,30 @@ export const useStore = create<AppState>((set, get) => ({
       };
 
       Object.entries(dataMap).forEach(([key, value]) => {
-        localStorage.setItem(`el_zatona_${key}`, JSON.stringify(value));
+        // Only cache small, essential datasets in localStorage
+        // Large datasets (items, prices, attachments, searchLogs, users) are excluded to avoid quota errors
+        if (['sections', 'favorites', 'lastFetch'].includes(key)) {
+          localStorage.setItem(`el_zatona_${key}`, JSON.stringify(value));
+        } else {
+          // Explicitly remove large keys to free up space
+          localStorage.removeItem(`el_zatona_${key}`);
+        }
       });
 
       set(dataMap);
+
+      // Set up real-time subscriptions if not already set
+      if (!(window as any).supabaseSubscriptions) {
+        const channels = [
+          supabase.channel('sections-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, () => get().fetchData(true)).subscribe(),
+          supabase.channel('items-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => get().fetchData(true)).subscribe(),
+          supabase.channel('prices-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'prices' }, () => get().fetchData(true)).subscribe(),
+          supabase.channel('favorites-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'favorites' }, () => get().fetchData(true)).subscribe(),
+          supabase.channel('attachments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'attachments' }, () => get().fetchData(true)).subscribe(),
+          supabase.channel('users-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => get().fetchData(true)).subscribe()
+        ];
+        (window as any).supabaseSubscriptions = channels;
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -236,7 +251,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newItems = [...get().items, itemWithId];
     set({ items: newItems });
-    localStorage.setItem('el_zatona_items', JSON.stringify(newItems));
     
     if (!error) get().fetchData(true);
   },
@@ -246,7 +260,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newItems = get().items.map(i => i.id === id ? { ...i, ...item } : i);
     set({ items: newItems });
-    localStorage.setItem('el_zatona_items', JSON.stringify(newItems));
     
     if (!error) get().fetchData(true);
   },
@@ -256,7 +269,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newItems = get().items.filter(i => i.id !== id);
     set({ items: newItems });
-    localStorage.setItem('el_zatona_items', JSON.stringify(newItems));
     
     if (!error) get().fetchData(true);
   },
@@ -267,7 +279,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newPrices = [...get().prices, priceWithId];
     set({ prices: newPrices });
-    localStorage.setItem('el_zatona_prices', JSON.stringify(newPrices));
     
     if (!error) get().fetchData(true);
   },
@@ -277,7 +288,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newPrices = get().prices.map(p => p.id === id ? { ...p, ...price } : p);
     set({ prices: newPrices });
-    localStorage.setItem('el_zatona_prices', JSON.stringify(newPrices));
     
     if (!error) get().fetchData(true);
   },
@@ -287,7 +297,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newPrices = get().prices.filter(p => p.id !== id);
     set({ prices: newPrices });
-    localStorage.setItem('el_zatona_prices', JSON.stringify(newPrices));
     
     if (!error) get().fetchData(true);
   },
@@ -340,9 +349,16 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  addAttachment: async (name, url, size) => {
+  addAttachment: async (name, url, size, item_id, section_id) => {
     const { user } = get();
-    const { error } = await supabase.from('attachments').insert([{ name, url, size, uploaded_by: user?.id }]);
+    const { error } = await supabase.from('attachments').insert([{ 
+      name, 
+      url, 
+      size, 
+      uploaded_by: user?.id,
+      item_id,
+      section_id
+    }]);
     if (!error) get().fetchData(true);
   },
 
@@ -357,7 +373,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newUsers = [...get().users, userWithId];
     set({ users: newUsers });
-    localStorage.setItem('el_zatona_users', JSON.stringify(newUsers));
     
     if (!error) get().fetchData(true);
   },
@@ -367,7 +382,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newUsers = get().users.map(u => u.id === id ? { ...u, ...userData } : u);
     set({ users: newUsers });
-    localStorage.setItem('el_zatona_users', JSON.stringify(newUsers));
     
     if (!error) get().fetchData(true);
   },
@@ -377,7 +391,6 @@ export const useStore = create<AppState>((set, get) => ({
     
     const newUsers = get().users.filter(u => u.id !== id);
     set({ users: newUsers });
-    localStorage.setItem('el_zatona_users', JSON.stringify(newUsers));
     
     if (!error) get().fetchData(true);
   },

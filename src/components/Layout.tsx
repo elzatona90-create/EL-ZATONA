@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import { Home, Layers, Paperclip, User, Search, Star, Users, Brain } from 'lucide-react';
@@ -16,6 +16,28 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
   const { user } = useStore();
 
   const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    // Initial state
+    if (!window.history.state) {
+      window.history.replaceState({ tab: activeTab }, '', '');
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.tab) {
+        setActiveTab(event.state.tab);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [setActiveTab, activeTab]);
+
+  const handleTabChange = (tabId: string) => {
+    if (tabId !== activeTab) {
+      window.history.pushState({ tab: tabId }, '', '');
+      setActiveTab(tabId);
+    }
+  };
 
   const navItems = [
     { id: 'home', icon: Home, label: t('home') },
@@ -44,7 +66,7 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
               <Brain className="w-8 h-8 text-neon-cyan" />
             )}
           </div>
-          <h1 className="text-xl font-black neon-text-cyan tracking-tighter">{t('app_name')}</h1>
+          <h1 className="text-2xl font-black neon-text-cyan tracking-widest whitespace-nowrap">{t('app_name')}</h1>
         </div>
       </header>
 
@@ -67,10 +89,10 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
         {navItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleTabChange(item.id)}
             className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
           >
-            <item.icon className="w-6 h-6 nav-icon" />
+            <item.icon className="w-5 h-5 nav-icon" />
             <span className="text-[10px] font-bold tracking-tighter">{item.label}</span>
           </button>
         ))}

@@ -1,0 +1,21 @@
+{
+  "name": "EL ZATONA",
+  "short_name": "ELZATONA",
+  "description": "El Zatona - Your Exclusive Knowledge Base",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f24",
+  "theme_color": "#00f2ff",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/elzatona/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/elzatona/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
