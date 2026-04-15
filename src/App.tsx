@@ -21,11 +21,18 @@ export default function App() {
 
   useEffect(() => {
     const init = async () => {
-      await fetchData();
-      setIsReady(true);
+      // If we have a user, we MUST wait for data before showing dashboard
+      if (user) {
+        await fetchData();
+        setIsReady(true);
+      } else {
+        // If no user, show login immediately and fetch data in background
+        setIsReady(true);
+        fetchData(); 
+      }
     };
     init();
-  }, [fetchData]);
+  }, [fetchData, user]);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';

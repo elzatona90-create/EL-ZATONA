@@ -129,82 +129,80 @@ export default function UserDashboard() {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-8"
           >
-            <div className="space-y-1">
-              <h2 className="text-3xl font-black neon-text-cyan">
-                {t('welcome')}, {user?.username}!
+            <div className="space-y-0.5 text-center">
+              <h2 className="text-2xl font-black neon-text-cyan tracking-tight">
+                Welcome Back, {user?.username}!
               </h2>
-              <p className="text-gray-400 font-medium tracking-tight">
-                {t('search_exclusive')}
+              <p className="text-gray-400 font-medium tracking-tight text-sm">
+                Search through our exclusive database
               </p>
             </div>
 
             {/* AI Search Assistant Card */}
-            <div className="glass-morphism rounded-[32px] border border-white/5 space-y-6 relative overflow-hidden min-h-[500px] flex flex-col">
-              <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-neon-cyan/20 flex items-center justify-center border border-neon-cyan/30">
-                    <MessageSquare className="w-6 h-6 text-neon-cyan" />
+            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] mx-auto w-full max-w-md min-h-[500px]">
+              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
+                    <MessageSquare className="w-5 h-5 text-neon-cyan" />
                   </div>
                   <div>
-                    <h3 className="font-black text-xl leading-tight">{t('ai_assistant')}</h3>
-                    <p className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase">{t('ai_powered')}</p>
+                    <h3 className="font-black text-lg text-white leading-none">Al Assistant</h3>
+                    <p className="text-[8px] font-black text-gray-500 tracking-[0.1em] uppercase">BY ISLAM AL SAPAA</p>
                   </div>
                 </div>
-                <button onClick={() => { setAiResponse(null); setGlobalSearchResults([]); }} className="text-gray-600 hover:text-white transition-colors">
-                  <Trash2 className="w-6 h-6" />
+                <button onClick={() => { setAiResponse(null); setGlobalSearchResults([]); }} className="text-gray-600 hover:text-white transition-colors p-1">
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="p-8 flex-1 flex flex-col gap-8 overflow-y-auto max-h-[600px]">
-                <div className="bg-[#2a2f4c] p-8 rounded-[32px] border border-white/5 relative">
-                  <div className="absolute -left-2 top-8 w-4 h-4 bg-[#2a2f4c] rotate-45 border-l border-b border-white/5"></div>
-                  <p className="text-lg font-bold leading-relaxed text-white">
-                    {aiResponse || t('ai_greeting')}
+              <div className="p-4 flex-1 flex flex-col gap-4">
+                <div className="bg-[#1a1f35]/80 p-5 rounded-[24px] border border-white/5 relative shadow-inner">
+                  <p className="text-base font-bold leading-relaxed text-white">
+                    {aiResponse || "Hello! Type a keyword to search."}
                   </p>
                 </div>
 
                 {globalSearchResults.length > 0 && (
-                  <div className="space-y-6">
-                    <p className="text-sm font-black text-neon-cyan uppercase tracking-widest px-4">Search Results</p>
+                  <div className="space-y-3 pb-4">
+                    <p className="text-[10px] font-black text-neon-cyan uppercase tracking-[0.2em] px-2">Results</p>
                     {globalSearchResults.map((item) => (
-                      <div key={item.id} className="item-card-vertical">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
-                              {item.section?.emoji} {item.section?.title || item.section?.name}
-                            </p>
-                            <h4 className="text-xl font-black text-white">{item.title || item.name}</h4>
+                      <div key={item.id} className="item-card-vertical !border-l-0 !p-4 !rounded-[20px] bg-[#1a1f35]/60 border border-white/10">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="space-y-0.5">
+                              <p className="text-[7px] font-black text-neon-cyan tracking-[0.1em] uppercase">NAME</p>
+                              <div className="inline-block px-3 py-0.5 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20">
+                                <h4 className="text-sm font-black text-neon-cyan">{item.title || item.name}</h4>
+                              </div>
+                            </div>
+                            <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
+                              {item.section?.title || item.section?.name}
+                            </div>
                           </div>
-                          <button 
-                            onClick={() => toggleFavorite(item.id)}
-                            className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
-                          >
-                            <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
-                          </button>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
+
                           <div className="space-y-1">
-                            {item.description?.split('\n').map((line: string, i: number) => (
-                              <p key={i} className="description-text">
-                                {line}
-                              </p>
-                            ))}
+                            <p className="text-[7px] font-black text-neon-cyan tracking-[0.1em] uppercase">DESCRIPTION</p>
+                            <div className="space-y-0.5">
+                              {item.description?.split('\n').map((line: string, i: number) => (
+                                <p key={i} className="text-xs font-bold text-white leading-tight">
+                                  {line}
+                                </p>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        {item.attachment_url && (
-                          <div className="pt-2">
+
+                          {item.attachment_url && (
                             <a 
                               href={item.attachment_url} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="inline-flex items-center gap-2 bg-neon-cyan/10 text-neon-cyan font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-cyan/20 transition-all"
+                              className="inline-flex items-center gap-2 bg-neon-cyan/5 border border-neon-cyan/30 text-neon-cyan font-black tracking-widest text-[7px] uppercase px-3 py-1.5 rounded-full hover:bg-neon-cyan/20 transition-all w-fit"
                             >
-                              <Paperclip className="w-4 h-4" />
-                              {t('view_attachment')}
+                              <Paperclip className="w-3 h-3" />
+                              VIEW
                             </a>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -212,32 +210,28 @@ export default function UserDashboard() {
               </div>
 
               {/* Search Input Area */}
-              <div className="p-8 pt-0">
-                <div className="flex items-center gap-4 bg-[#2a2f4c] rounded-[24px] px-6 py-4 border-2 border-white/10 focus-within:border-neon-cyan transition-all">
-                  <input 
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAISearch()}
-                    placeholder={t('ai_placeholder')}
-                    className="flex-1 bg-transparent focus:outline-none text-lg font-bold px-2"
-                  />
-                  <div className="flex items-center gap-2">
-                    <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                      <Mic className="w-6 h-6" />
-                    </button>
-                    <button 
-                      onClick={handleAISearch}
-                      disabled={isAiLoading}
-                      className="p-3 bg-neon-cyan text-dark-bg rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,242,255,0.4)]"
-                    >
-                      <Send className={`w-6 h-6 ${isAiLoading ? 'animate-pulse' : ''}`} />
+              <div className="p-4 pt-2 bg-dark-bg/40 backdrop-blur-sm border-t border-white/5">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 flex items-center gap-3 bg-[#1a1f35] rounded-[20px] px-4 py-3 border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,242,255,0.1)] focus-within:shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all">
+                    <input 
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAISearch()}
+                      placeholder="Ask me..."
+                      className="flex-1 bg-transparent focus:outline-none text-sm font-bold text-white placeholder:text-gray-600"
+                    />
+                    <button className="p-1 text-gray-500 hover:text-neon-cyan transition-colors">
+                      <Mic className="w-5 h-5" />
                     </button>
                   </div>
-                </div>
-                <div className="text-center mt-6 space-y-1">
-                  <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">{t('footer_team')}</p>
-                  <p className="text-[9px] font-black text-neon-magenta tracking-[0.2em] uppercase">{t('branding_content')}</p>
+                  <button 
+                    onClick={handleAISearch}
+                    disabled={isAiLoading}
+                    className="p-3.5 bg-gradient-to-br from-neon-cyan to-neon-magenta text-white rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-50"
+                  >
+                    <Send className={`w-4 h-4 ${isAiLoading ? 'animate-pulse' : ''}`} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -381,14 +375,16 @@ export default function UserDashboard() {
               <div className="space-y-6">
                 <button 
                   onClick={() => setSelectedSection(null)}
-                  className="flex items-center gap-2 text-neon-cyan font-bold uppercase tracking-widest text-xs hover:opacity-80 transition-all"
+                  className="flex items-center gap-2 text-neon-cyan font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-all"
                 >
                   <ArrowLeft className="w-4 h-4" /> BACK TO SECTIONS
                 </button>
 
-                <div className="flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-neon-cyan" />
-                  <h3 className="text-2xl font-black text-neon-cyan">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
+                    <FileText className="w-6 h-6 text-neon-cyan" />
+                  </div>
+                  <h3 className="text-3xl font-black text-neon-cyan tracking-tight">
                     {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
                   </h3>
                 </div>
@@ -506,48 +502,49 @@ export default function UserDashboard() {
                   />
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {filteredItems.map((item) => (
-                    <div key={item.id} className="item-card-vertical">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
-                            {sections.find(s => s.id === item.section_id)?.emoji} {sections.find(s => s.id === item.section_id)?.title || sections.find(s => s.id === item.section_id)?.name}
-                          </p>
-                          <h4 className="text-xl font-black text-white">{item.title}</h4>
+                    <div key={item.id} className="item-card-vertical !border-l-0 !p-8 !rounded-[40px] bg-[#1a1f35]/60 border border-white/10">
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">NAME</p>
+                          <div className="inline-block px-6 py-2 rounded-2xl bg-neon-cyan/10 border border-neon-cyan/30">
+                            <h4 className="text-2xl font-black text-neon-cyan">{item.title}</h4>
+                          </div>
                         </div>
-                        <button 
-                          onClick={() => toggleFavorite(item.id)}
-                          className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
-                        >
-                          <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
-                        </button>
-                      </div>
 
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
-                        <div className="space-y-1">
-                          {item.description?.split('\n').map((line: string, i: number) => (
-                            <p key={i} className="description-text">
-                              {line}
-                            </p>
-                          ))}
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">DESCRIPTION</p>
+                          <div className="space-y-2">
+                            {item.description?.split('\n').map((line: string, i: number) => (
+                              <p key={i} className="text-lg font-bold text-white leading-relaxed">
+                                {line}
+                              </p>
+                            ))}
+                          </div>
                         </div>
-                      </div>
 
-                      {item.attachment_url && (
-                        <div className="pt-2">
-                          <a 
-                            href={item.attachment_url} 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-2 bg-neon-cyan/10 text-neon-cyan font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-cyan/20 transition-all"
-                          >
-                            <Paperclip className="w-4 h-4" />
-                            {t('view_attachment')}
-                          </a>
+                        <div className="flex flex-wrap gap-3">
+                          <div className="px-4 py-2 rounded-full bg-blue-900/40 border border-blue-500/30 text-[10px] font-black text-blue-400 uppercase tracking-widest">
+                            {sections.find(s => s.id === item.section_id)?.title || sections.find(s => s.id === item.section_id)?.name}
+                          </div>
                         </div>
-                      )}
+
+                        {item.attachment_url && (
+                          <div className="space-y-3 pt-2">
+                            <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">ATTACHMENT</p>
+                            <a 
+                              href={item.attachment_url} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-3 bg-neon-cyan/5 border border-neon-cyan/30 text-neon-cyan font-black tracking-widest text-[10px] uppercase px-6 py-3 rounded-full hover:bg-neon-cyan/20 transition-all"
+                            >
+                              <Paperclip className="w-4 h-4" />
+                              VIEW ATTACHMENT
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

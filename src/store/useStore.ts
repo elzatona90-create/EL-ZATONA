@@ -11,6 +11,7 @@ interface AppState {
   attachments: any[];
   users: any[];
   lastFetch: number;
+  isFetching: boolean;
   theme: 'teal' | 'pink' | 'blue';
   language: 'en' | 'ar';
   
@@ -74,6 +75,7 @@ export const useStore = create<AppState>((set, get) => ({
   attachments: [],
   users: [],
   lastFetch: Number(localStorage.getItem('el_zatona_last_fetch') || '0'),
+  isFetching: false,
   theme: (localStorage.getItem('el_zatona_theme') as any) || 'teal',
   language: (localStorage.getItem('el_zatona_lang') as any) || 'en',
 
@@ -98,31 +100,19 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   fetchData: async (force = false) => {
-    const { lastFetch } = get();
+    const { lastFetch, isFetching } = get();
+    if (isFetching) return;
+
     const now = Date.now();
+    const CACHE_DURATION = 5 * 60 * 1000; 
 
     if (!force && now - lastFetch < CACHE_DURATION && get().sections.length > 0) {
-      console.log("Using cached data");
       return;
     }
 
-    try {
-      const { data: existingSections } = await supabase.from('sections').select('id').limit(1);
-      if (!existingSections || existingSections.length === 0) {
-        const initialSections = [
-          { title: 'Contracts', emoji: '📄', slug: 'contracts' },
-          { title: 'Prices', emoji: '💰', slug: 'prices' },
-          { title: 'Analysis Conditions', emoji: '🧪', slug: 'conditions' },
-          { title: 'Analysis Shortcuts', emoji: '🔬', slug: 'shortcuts' },
-          { title: 'Problem Solving', emoji: '🔧', slug: 'problems' },
-          { title: 'Application', emoji: '📱', slug: 'application' },
-          { title: 'Diagnoses', emoji: '🏥', slug: 'diagnoses' },
-          { title: 'Question Bank', emoji: '❓', slug: 'questions' },
-          { title: 'Applications Section', emoji: '📂', slug: 'applications_section' }
-        ];
-        await supabase.from('sections').insert(initialSections);
-      }
+    set({ isFetching: true });
 
+    try {
       const [
         { data: sections },
         { data: items },
@@ -141,6 +131,11 @@ export const useStore = create<AppState>((set, get) => ({
         supabase.from('users').select('*')
       ]);
 
+      // If no sections, seed them in background
+      if (!sections || sections.length === 0) {
+        get().seedSections();
+      }
+
       const dataMap = {
         sections: sections || [],
         items: items || [],
@@ -149,7 +144,8 @@ export const useStore = create<AppState>((set, get) => ({
         searchLogs: searchLogs || [],
         attachments: attachments || [],
         users: users || [],
-        lastFetch: now
+        lastFetch: now,
+        isFetching: false
       };
 
       Object.entries(dataMap).forEach(([key, value]) => {
@@ -179,6 +175,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      set({ isFetching: false });
     }
   },
 
