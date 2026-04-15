@@ -56,7 +56,7 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
           <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-neon-cyan p-0.5 bg-dark-bg neon-glow-cyan flex items-center justify-center">
             {!imgError ? (
               <img 
-                src={BRANDING.logo_url} 
+                src={`${BRANDING.logo_url}?v=2`}
                 alt="Logo" 
                 className="w-full h-full object-cover rounded-lg"
                 referrerPolicy="no-referrer"
