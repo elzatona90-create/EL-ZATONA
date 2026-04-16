@@ -139,8 +139,8 @@ export default function UserDashboard() {
             </div>
 
             {/* AI Search Assistant Card */}
-            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] mx-auto w-full max-w-md min-h-[500px]">
-              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] mx-auto w-full max-w-[360px] h-[700px] md:h-[750px]">
+              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
                     <MessageSquare className="w-5 h-5 text-neon-cyan" />
@@ -155,8 +155,8 @@ export default function UserDashboard() {
                 </button>
               </div>
 
-              <div className="p-4 flex-1 flex flex-col gap-4">
-                <div className="bg-[#1a1f35]/80 p-5 rounded-[24px] border border-white/5 relative shadow-inner">
+              <div className="p-4 flex-1 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+                <div className="bg-[#1a1f35]/80 p-5 rounded-[24px] border border-white/5 relative shadow-inner shrink-0">
                   <p className="text-base font-bold leading-relaxed text-white">
                     {aiResponse || "Hello! Type a keyword to search."}
                   </p>

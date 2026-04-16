@@ -76,9 +76,6 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
 
       {/* Persistent Branding at Bottom */}
       <div className="fixed bottom-24 left-0 right-0 text-center pointer-events-none z-40">
-        <p className="text-[10px] font-black neon-text-cyan tracking-[0.2em] uppercase opacity-50">
-          {t('footer_team')}
-        </p>
         <p className="text-[8px] font-bold text-neon-magenta tracking-[0.1em] uppercase opacity-50">
           {t('branding_content')}
         </p>
