@@ -50,25 +50,23 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
   ];
 
   return (
-    <div className="min-h-screen pb-24 bg-slate-50">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 p-4 shadow-sm">
-        <div className="flex justify-between items-center max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 p-0.5 bg-white flex items-center justify-center">
-              {!imgError ? (
-                <img 
-                  src={BRANDING.logo_url}
-                  alt="Logo" 
-                  className="w-full h-full object-cover rounded-lg"
-                  referrerPolicy="no-referrer"
-                  onError={() => setImgError(true)}
-                />
-              ) : (
-                <Brain className="w-6 h-6 text-teal-600" />
-              )}
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">{t('app_name')}</h1>
+    <div className="min-h-screen pb-32 relative">
+      <header className="p-6 flex justify-between items-center max-w-4xl mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-neon-cyan p-0.5 bg-dark-bg neon-glow-cyan flex items-center justify-center">
+            {!imgError ? (
+              <img 
+                src={BRANDING.logo_url} 
+                alt="Logo" 
+                className="w-full h-full object-cover rounded-lg"
+                referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <Brain className="w-8 h-8 text-neon-cyan" />
+            )}
           </div>
+          <h1 className="text-2xl font-black neon-text-cyan tracking-widest whitespace-nowrap">{t('app_name')}</h1>
         </div>
       </header>
 
@@ -76,16 +74,26 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
         {children}
       </main>
 
+      {/* Persistent Branding at Bottom */}
+      <div className="fixed bottom-24 left-0 right-0 text-center pointer-events-none z-40">
+        <p className="text-[10px] font-black neon-text-cyan tracking-[0.2em] uppercase opacity-50">
+          {t('footer_team')}
+        </p>
+        <p className="text-[8px] font-bold text-neon-magenta tracking-[0.1em] uppercase opacity-50">
+          {t('branding_content')}
+        </p>
+      </div>
+
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <nav className="bottom-nav">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => handleTabChange(item.id)}
-            className={`flex flex-col items-center gap-1 transition-colors ${activeTab === item.id ? 'text-teal-600' : 'text-slate-400'}`}
+            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
           >
-            <item.icon className={`w-6 h-6 ${activeTab === item.id ? 'fill-teal-600/10' : ''}`} />
-            <span className="text-[10px] font-bold tracking-tight">{item.label}</span>
+            <item.icon className="w-5 h-5 nav-icon" />
+            <span className="text-[10px] font-bold tracking-tighter">{item.label}</span>
           </button>
         ))}
       </nav>

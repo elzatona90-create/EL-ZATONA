@@ -12,6 +12,7 @@ import './lib/i18n';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
+import MigrationPage from './pages/MigrationPage';
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -19,13 +20,19 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const init = () => {
-      fetchData();
-      useStore.getState().initializeRealtime();
-      setIsReady(true);
+    const init = async () => {
+      // If we have a user, we MUST wait for data before showing dashboard
+      if (user) {
+        await fetchData();
+        setIsReady(true);
+      } else {
+        // If no user, show login immediately and fetch data in background
+        setIsReady(true);
+        fetchData(); 
+      }
     };
     init();
-  }, [fetchData]);
+  }, [fetchData, user]);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -42,6 +49,16 @@ export default function App() {
 
   if (!user) {
     return <Login />;
+  }
+
+  // Simple routing for migration page
+  if (window.location.pathname === '/migrate') {
+    if (user.role === 'admin') {
+      return <MigrationPage />;
+    } else {
+      window.location.href = '/';
+      return null;
+    }
   }
 
   return user.role === 'admin' ? <AdminDashboard /> : <UserDashboard />;

@@ -63,10 +63,7 @@ const resources = {
       search_count: 'Search Count',
       last_searched: 'Last Searched',
       prices: 'Prices',
-      application: 'Application',
-      sign_in_google: 'Sign in with Google',
-      google_login_failed: 'Google Login Failed',
-      or_classic: 'OR USE CLASSIC'
+      application: 'Application'
     }
   },
   ar: {
@@ -129,10 +126,7 @@ const resources = {
       search_count: 'عدد البحث',
       last_searched: 'آخر بحث',
       prices: 'الأسعار',
-      application: 'الأبلكيشن',
-      sign_in_google: 'الدخول بجوجل',
-      google_login_failed: 'فشل الدخول بجوجل',
-      or_classic: 'أو استخدم الدخول الكلاسيكي'
+      application: 'الأبلكيشن'
     }
   }
 };
