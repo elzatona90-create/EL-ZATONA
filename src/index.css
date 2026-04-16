@@ -2,133 +2,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-neon-cyan: #00f2ff;
-  --color-neon-magenta: #ff007f;
-  --color-dark-bg: #0a0f24;
-  --color-glass-bg: rgba(26, 31, 53, 0.6);
-  --color-glass-border: rgba(255, 255, 255, 0.05);
+  --color-brand-primary: #0d9488; /* Teal-600 */
+  --color-brand-secondary: #db2777; /* Pink-600 */
+  --color-brand-accent: #2563eb; /* Blue-600 */
   --font-sans: "Inter", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply text-white min-h-screen font-sans antialiased;
-    background: linear-gradient(135deg, #001233 0%, #1a0b2e 50%, #4a0033 100%);
-    background-attachment: fixed;
+    @apply bg-slate-50 text-slate-900 min-h-screen font-sans antialiased;
   }
 }
 
 @layer components {
-  .neon-glow-cyan {
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.3), 0 0 20px rgba(0, 242, 255, 0.1);
-  }
-
-  .neon-glow-magenta {
-    box-shadow: 0 0 10px rgba(255, 0, 127, 0.3), 0 0 20px rgba(255, 0, 127, 0.1);
-  }
-
-  .neon-glow-pink-subtle {
-    box-shadow: 0 0 15px rgba(255, 0, 127, 0.15), inset 0 0 10px rgba(255, 0, 127, 0.05);
-  }
-
   .glass-morphism {
-    background: rgba(26, 31, 53, 0.6);
-    border: 1px solid rgba(0, 242, 255, 0.5);
-    backdrop-filter: blur(24px);
-    box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1), 0 0 20px rgba(0, 242, 255, 0.2), 0 0 40px rgba(0, 242, 255, 0.1);
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
   }
 
-  .glass-morphism-magenta {
-    background: rgba(26, 31, 53, 0.6);
-    border: 1px solid rgba(255, 0, 127, 0.5);
-    backdrop-filter: blur(24px);
-    box-shadow: inset 0 0 30px rgba(255, 0, 127, 0.1), 0 0 20px rgba(255, 0, 127, 0.2), 0 0 40px rgba(255, 0, 127, 0.1);
-  }
-
-  .neon-text-cyan {
-    @apply text-neon-cyan;
-    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-  }
-
-  .neon-text-magenta {
-    @apply text-neon-magenta;
-    text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
-  }
-
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(26, 31, 53, 0.6);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(24px);
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-    padding: 12px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 50;
-    border-radius: 24px 24px 0 0;
+  .card-standard {
+    @apply bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow;
   }
 
   .nav-item {
-    @apply flex flex-col items-center gap-1 text-gray-500 transition-all duration-300;
+    @apply flex flex-col items-center gap-1 text-slate-400 transition-colors;
   }
 
   .nav-item.active {
-    @apply text-white;
-  }
-
-  .nav-item.active .nav-icon {
-    @apply text-neon-cyan;
-    filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.5));
-  }
-
-  .item-card-vertical {
-    background: rgba(26, 31, 53, 0.6);
-    border: 1px solid rgba(0, 242, 255, 0.5);
-    backdrop-filter: blur(24px);
-    border-radius: 32px;
-    padding: 32px;
-    border-left: 8px solid #ff007f;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1), 0 0 20px rgba(0, 242, 255, 0.2), 0 0 40px rgba(0, 242, 255, 0.1);
-  }
-
-  .item-card-vertical:hover {
-    @apply border-neon-cyan;
-    box-shadow: 0 0 30px rgba(255, 0, 127, 0.2), inset 0 0 20px rgba(0, 242, 255, 0.1);
+    @apply text-teal-600;
   }
 
   .description-text {
-    @apply text-white font-bold text-base leading-relaxed;
-  }
-
-  .neon-border-magenta {
-    @apply border-2 border-neon-magenta/30 focus:border-neon-magenta transition-all;
-    box-shadow: 0 0 10px rgba(255, 0, 127, 0.1);
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 242, 255, 0.2);
-    border-radius: 10px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 242, 255, 0.4);
+    @apply text-slate-600 text-sm leading-relaxed;
   }
 }

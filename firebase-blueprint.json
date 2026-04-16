@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Application users",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["username", "password", "role"]
+    },
+    "Section": {
+      "title": "Section",
+      "description": "Data categories",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "emoji": { "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["title", "slug"]
+    },
+    "Item": {
+      "title": "Item",
+      "description": "Data items within sections",
+      "type": "object",
+      "properties": {
+        "section_id": { "type": "string" },
+        "title": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "attachment_url": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["section_id"]
+    },
+    "Price": {
+      "title": "Price",
+      "description": "Price analysis data",
+      "type": "object",
+      "properties": {
+        "analysis_name": { "type": "string" },
+        "company_name": { "type": "string" },
+        "price": { "type": "number" },
+        "contract_type": { "type": "string" }
+      },
+      "required": ["analysis_name", "company_name", "price"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "User favorite items",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "item_id": { "type": "string" }
+      },
+      "required": ["user_id", "item_id"]
+    },
+    "Attachment": {
+      "title": "Attachment",
+      "description": "Uploaded files",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "url": { "type": "string" },
+        "size": { "type": "number" },
+        "uploaded_by": { "type": "string" },
+        "item_id": { "type": "string" },
+        "section_id": { "type": "string" }
+      },
+      "required": ["name", "url"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/sections/{sectionId}": {
+      "schema": "Section",
+      "description": "Data sections"
+    },
+    "/items/{itemId}": {
+      "schema": "Item",
+      "description": "Section items"
+    },
+    "/prices/{priceId}": {
+      "schema": "Price",
+      "description": "Price list"
+    },
+    "/favorites/{favoriteId}": {
+      "schema": "Favorite",
+      "description": "User favorites"
+    },
+    "/attachments/{attachmentId}": {
+      "schema": "Attachment",
+      "description": "File attachments"
+    }
+  }
+}

@@ -275,48 +275,48 @@ export default function AdminDashboard() {
           >
             <div className="flex justify-between items-end">
               <div className="space-y-1">
-                <h2 className="text-4xl font-black neon-text-cyan uppercase tracking-tight">
+                <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tight">
                   {t('analytics')}
                 </h2>
-                <p className="text-gray-400 font-medium tracking-tight">
+                <p className="text-slate-500 font-medium tracking-tight">
                   {t('welcome')}, {user?.username}
                 </p>
               </div>
-              <div className="w-16 h-16 rounded-2xl glass-morphism border-neon-magenta/30 flex items-center justify-center">
-                <TrendingUp className="w-8 h-8 text-neon-magenta" />
+              <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <TrendingUp className="w-8 h-8 text-teal-600" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-cyan">
-                <p className="text-[10px] font-black text-neon-cyan tracking-widest uppercase mb-1">TOTAL SECTIONS</p>
-                <h4 className="text-3xl font-black">{sections.length}</h4>
+              <div className="bg-white border border-slate-200 p-6 rounded-[24px] shadow-sm border-l-4 border-l-teal-600">
+                <p className="text-[10px] font-black text-teal-600 tracking-widest uppercase mb-1">TOTAL SECTIONS</p>
+                <h4 className="text-3xl font-black text-slate-900">{sections.length}</h4>
               </div>
-              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-magenta">
-                <p className="text-[10px] font-black text-neon-magenta tracking-widest uppercase mb-1">TOTAL USERS</p>
-                <h4 className="text-3xl font-black">{users.length}</h4>
+              <div className="bg-white border border-slate-200 p-6 rounded-[24px] shadow-sm border-l-4 border-l-pink-600">
+                <p className="text-[10px] font-black text-pink-600 tracking-widest uppercase mb-1">TOTAL USERS</p>
+                <h4 className="text-3xl font-black text-slate-900">{users.length}</h4>
               </div>
             </div>
 
             {/* Top 5 Searches Chart */}
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h3 className="text-xl font-black flex items-center gap-3">
-                <BarChart3 className="w-6 h-6 text-neon-cyan" />
+            <div className="bg-white border border-slate-200 p-8 rounded-[32px] shadow-xl space-y-6">
+              <h3 className="text-xl font-black flex items-center gap-3 text-slate-900">
+                <BarChart3 className="w-6 h-6 text-teal-600" />
                 {t('top_searches')}
               </h3>
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={searchLogs.slice(0, 5)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="search_term" stroke="#666" fontSize={10} />
-                    <YAxis stroke="#666" fontSize={10} />
+                   <BarChart data={searchLogs.slice(0, 5)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="search_term" stroke="#64748b" fontSize={10} />
+                    <YAxis stroke="#64748b" fontSize={10} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#000a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                      itemStyle={{ color: '#00f2ff' }}
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px' }}
+                      itemStyle={{ color: '#0d9488' }}
                     />
-                    <Bar dataKey="count" fill="#00f2ff" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="count" fill="#0d9488" radius={[4, 4, 0, 0]}>
                       {searchLogs.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#00f2ff' : '#ff00ff'} />
+                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#0d9488' : '#db2777'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -325,23 +325,23 @@ export default function AdminDashboard() {
             </div>
 
             {/* User Activity List */}
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h3 className="text-xl font-black flex items-center gap-3">
-                <History className="w-6 h-6 text-neon-magenta" />
+            <div className="bg-white border border-slate-200 p-8 rounded-[32px] shadow-xl space-y-6">
+              <h3 className="text-xl font-black flex items-center gap-3 text-slate-900">
+                <History className="w-6 h-6 text-pink-600" />
                 {t('user_activity')}
               </h3>
               <div className="space-y-4">
                 {searchLogs.slice(0, 10).map((log) => (
-                  <div key={log.id} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <div key={log.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <div>
-                      <p className="font-bold text-sm">{log.search_term}</p>
-                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">
+                      <p className="font-bold text-sm text-slate-900">{log.search_term}</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">
                         {users.find(u => u.id === log.user_id)?.username || 'Anonymous'}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-neon-cyan">{log.count} {t('search_count')}</p>
-                      <p className="text-[8px] text-gray-600 uppercase">
+                      <p className="text-xs font-bold text-teal-600">{log.count} {t('search_count')}</p>
+                      <p className="text-[8px] text-slate-400 uppercase">
                         {new Date(log.last_searched_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -360,22 +360,22 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="space-y-1">
-              <h2 className="text-4xl font-black neon-text-cyan uppercase tracking-tight">
+              <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tight">
                 {t('global_search')}
               </h2>
-              <p className="text-gray-400 font-medium tracking-tight">
+              <p className="text-slate-500 font-medium tracking-tight">
                 Search across all sections and items
               </p>
             </div>
 
             <div className="relative">
-              <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-500" />
+              <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
               <input 
                 type="text"
                 value={globalSearchQuery}
                 onChange={(e) => handleGlobalSearch(e.target.value)}
                 placeholder="Search everything..."
-                className="w-full bg-white/5 border-2 border-white/10 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-neon-cyan transition-all text-lg"
+                className="w-full bg-white border-2 border-slate-100 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-teal-600 transition-all text-lg shadow-xl"
               />
             </div>
 
@@ -383,7 +383,7 @@ export default function AdminDashboard() {
               {globalSearchResults.map((item) => (
                 <div 
                   key={item.id} 
-                  className="item-card-vertical cursor-pointer group"
+                  className="bg-white border border-slate-200 p-6 rounded-[32px] shadow-sm hover:shadow-md cursor-pointer group transition-all"
                   onClick={() => {
                     setSelectedSection(item.section_id);
                     setActiveTab('sections');
@@ -391,10 +391,10 @@ export default function AdminDashboard() {
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
+                      <p className="text-[10px] font-black text-teal-600 tracking-[0.2em] uppercase">
                         {item.section?.emoji} {item.section?.title || item.section?.name}
                       </p>
-                      <h4 className="text-xl font-black text-white">{item.title}</h4>
+                      <h4 className="text-xl font-black text-slate-900 group-hover:text-teal-600 transition-colors uppercase">{item.title}</h4>
                     </div>
                     <div className="flex gap-2">
                       <button 
@@ -1119,8 +1119,8 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-cyan">{t('attachments')}</h3>
-              <label className="cursor-pointer p-3 bg-neon-magenta/20 rounded-xl text-neon-magenta hover:bg-neon-magenta/30 transition-all">
+              <h3 className="text-3xl font-black text-slate-900">{t('attachments')}</h3>
+              <label className="cursor-pointer p-3 bg-pink-50 rounded-xl text-pink-600 hover:bg-pink-100 transition-all border border-pink-100">
                 <Upload className={`w-6 h-6 ${isUploading ? 'animate-bounce' : ''}`} />
                 <input 
                   type="file" 
@@ -1133,13 +1133,13 @@ export default function AdminDashboard() {
             </div>
 
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                 type="text"
                 value={attachmentSearch}
                 onChange={(e) => setAttachmentSearch(e.target.value)}
                 placeholder="Search attachments..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-teal-600 shadow-sm"
               />
             </div>
 
@@ -1147,19 +1147,19 @@ export default function AdminDashboard() {
               {attachments
                 .filter(f => f.name.toLowerCase().includes(attachmentSearch.toLowerCase()))
                 .map((file) => (
-                <div key={file.id} className="glass-morphism p-8 rounded-[32px] flex justify-between items-center group">
+                <div key={file.id} className="bg-white border border-slate-200 p-8 rounded-[32px] flex justify-between items-center group shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center border border-white/10">
-                      <FileText className="w-8 h-8 text-neon-magenta" />
+                    <div className="w-16 h-16 rounded-[24px] bg-slate-50 flex items-center justify-center border border-slate-100">
+                      <FileText className="w-8 h-8 text-pink-600" />
                     </div>
                     <div>
-                      <h4 className="text-xl font-black truncate max-w-[200px]">{file.name}</h4>
+                      <h4 className="text-xl font-black truncate max-w-[200px] text-slate-900">{file.name}</h4>
                       <div className="flex items-center gap-2">
-                        <p className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">
+                        <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
                           {(file.size / 1024).toFixed(1)} KB | {new Date(file.created_at).toLocaleDateString()}
                         </p>
                         {file.section_id && (
-                          <span className="text-[8px] font-black text-neon-cyan tracking-widest uppercase bg-neon-cyan/10 px-2 py-0.5 rounded">
+                          <span className="text-[8px] font-black text-teal-600 tracking-widest uppercase bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
                             {sections.find(s => s.id === file.section_id)?.emoji} {sections.find(s => s.id === file.section_id)?.title || sections.find(s => s.id === file.section_id)?.name}
                           </span>
                         )}
@@ -1171,13 +1171,13 @@ export default function AdminDashboard() {
                       href={file.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-3 bg-white/5 rounded-xl text-neon-cyan hover:bg-neon-cyan/10"
+                      className="p-3 bg-slate-50 rounded-xl text-teal-600 hover:bg-teal-100 border border-slate-100 transition-colors"
                     >
                       <Paperclip className="w-6 h-6" />
                     </a>
                     <button 
                       onClick={() => deleteAttachment(file.id)}
-                      className="p-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                      className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="w-6 h-6" />
                     </button>
@@ -1196,39 +1196,38 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-magenta">{t('users')}</h3>
+              <h3 className="text-3xl font-black text-pink-600">{t('users')}</h3>
               <button 
                 onClick={() => setIsAddingUser(true)}
-                className="p-3 bg-neon-cyan/20 rounded-xl text-neon-cyan hover:bg-neon-cyan/30 transition-all"
+                className="p-3 bg-teal-50 rounded-xl text-teal-600 hover:bg-teal-100 transition-all border border-teal-100"
               >
                 <Plus className="w-6 h-6" />
               </button>
             </div>
 
             {isAddingUser && (
-              <div className="glass-morphism p-8 rounded-[32px] space-y-4">
+              <div className="bg-white border border-slate-200 p-8 rounded-[32px] space-y-4 shadow-xl">
                 <input 
                   type="text"
                   value={newUser.username}
                   onChange={(e) => setNewUser({...newUser, username: e.target.value})}
                   placeholder="Username"
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-teal-600 transition-all"
                 />
                 <input 
                   type="password"
                   value={newUser.password}
                   onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                   placeholder="Password"
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-teal-600 transition-all"
                 />
                 <select 
                   value={newUser.role}
                   onChange={(e) => setNewUser({...newUser, role: e.target.value as any})}
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 focus:border-teal-600 outline-none transition-all appearance-none cursor-pointer font-bold text-slate-700"
                 >
-                  <option value="user" className="bg-dark-bg">User</option>
-                  <option value="admin" className="bg-dark-bg">Admin</option>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
                 </select>
                 <div className="flex gap-2">
                   <button 
@@ -1237,33 +1236,33 @@ export default function AdminDashboard() {
                       await addUser(newUser);
                       setIsAddingUser(false);
                       setNewUser({ username: '', password: '', role: 'user' });
-                      await fetchData(true);
+                      fetchData();
                     }} 
-                    className="flex-1 bg-neon-cyan text-dark-bg font-bold py-3 rounded-xl"
+                    className="flex-1 bg-teal-600 text-white font-bold py-3 rounded-xl hover:bg-teal-700 transition-colors"
                   >
                     Add User
                   </button>
-                  <button onClick={() => setIsAddingUser(false)} className="flex-1 bg-white/10 font-bold py-3 rounded-xl">Cancel</button>
+                  <button onClick={() => setIsAddingUser(false)} className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancel</button>
                 </div>
               </div>
             )}
 
             <div className="grid grid-cols-1 gap-4">
               {users.map((u) => (
-                <div key={u.id} className="glass-morphism p-6 rounded-[24px] flex justify-between items-center group">
+                <div key={u.id} className="bg-white border border-slate-200 p-6 rounded-[24px] flex justify-between items-center group shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <UserIcon className={`w-6 h-6 ${u.role === 'admin' ? 'text-neon-magenta' : 'text-neon-cyan'}`} />
+                    <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                      <UserIcon className={`w-6 h-6 ${u.role === 'admin' ? 'text-pink-600' : 'text-teal-600'}`} />
                     </div>
                     <div>
-                      <h4 className="text-xl font-black">{u.username}</h4>
-                      <p className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">{u.role}</p>
+                      <h4 className="text-xl font-black text-slate-900">{u.username}</h4>
+                      <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">{u.role}</p>
                     </div>
                   </div>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
                     <button 
                       onClick={() => deleteUser(u.id)}
-                      className="p-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
+                      className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
                       <Trash2 className="w-6 h-6" />
                     </button>
@@ -1279,37 +1278,43 @@ export default function AdminDashboard() {
             key="me"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-8"
+            className="space-y-8 pb-20"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-magenta">{t('settings')}</h3>
+              <h3 className="text-3xl font-black text-pink-600">{t('settings')}</h3>
               <button 
                 onClick={logout}
-                className="p-3 bg-red-500/20 text-red-500 rounded-xl font-black uppercase tracking-widest text-xs flex items-center gap-2"
+                className="p-3 bg-red-50 text-red-600 rounded-xl font-black uppercase tracking-widest text-xs flex items-center gap-2 border border-red-100 hover:bg-red-100 transition-colors"
               >
                 <LogOut className="w-4 h-4" /> {t('logout')}
               </button>
             </div>
 
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <UserIcon className="w-6 h-6 text-neon-cyan" />
+            <div className="bg-white border border-slate-200 p-8 rounded-[32px] space-y-6 shadow-xl">
+              <h4 className="text-xl font-black flex items-center gap-3 text-slate-900">
+                <UserIcon className="w-6 h-6 text-teal-600" />
                 {t('profile')}
               </h4>
               <div className="space-y-4">
-                <input 
-                  type="text"
-                  defaultValue={user?.username}
-                  id="admin-username"
-                  placeholder="New Username"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all"
-                />
-                <input 
-                  type="password"
-                  id="admin-password"
-                  placeholder="New Password"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all"
-                />
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">{t('username')}</p>
+                  <input 
+                    type="text"
+                    defaultValue={user?.username}
+                    id="admin-username"
+                    placeholder="New Username"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:border-teal-600 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">{t('password')}</p>
+                  <input 
+                    type="password"
+                    id="admin-password"
+                    placeholder="New Password"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:border-teal-600 outline-none transition-all"
+                  />
+                </div>
                 <button 
                   onClick={async () => {
                     const username = (document.getElementById('admin-username') as HTMLInputElement).value;
@@ -1317,7 +1322,7 @@ export default function AdminDashboard() {
                     await updateCurrentUser({ username, password });
                     alert('Profile updated successfully');
                   }}
-                  className="w-full bg-neon-cyan text-dark-bg font-black py-3 rounded-xl uppercase tracking-widest text-xs"
+                  className="w-full bg-teal-600 text-white font-black py-4 rounded-xl uppercase tracking-widest text-xs hover:bg-teal-700 transition-colors shadow-lg"
                 >
                   Save Changes
                 </button>
@@ -1325,131 +1330,23 @@ export default function AdminDashboard() {
             </div>
 
             {deferredPrompt && (
-              <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-                <h4 className="text-xl font-black flex items-center gap-3">
-                  <Settings className="w-6 h-6 text-neon-cyan" />
+              <div className="bg-white border border-slate-200 p-8 rounded-[32px] space-y-6 shadow-xl">
+                <h4 className="text-xl font-black flex items-center gap-3 text-slate-900">
+                  <Settings className="w-6 h-6 text-teal-600" />
                   Download App
                 </h4>
                 <button 
                   onClick={handleInstall}
-                  className="w-full bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 font-black py-4 rounded-xl uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+                  className="w-full bg-teal-50 text-teal-600 border border-teal-100 font-black py-4 rounded-xl uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-teal-100 transition-colors"
                 >
                   Install Application
                 </button>
               </div>
             )}
 
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Users className="w-6 h-6 text-neon-cyan" />
-                {t('user_management')}
-              </h4>
-              
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <input 
-                    type="text"
-                    value={newUser.username}
-                    onChange={(e) => setNewUser({...newUser, username: e.target.value})}
-                    placeholder="Username"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2"
-                  />
-                  <input 
-                    type="password"
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                    placeholder="Password"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2"
-                  />
-                  <button 
-                    onClick={handleAddUser}
-                    className="p-2 bg-neon-cyan text-dark-bg rounded-xl"
-                  >
-                    <Plus className="w-6 h-6" />
-                  </button>
-                </div>
-
-                <div className="space-y-2">
-                  {users.map((u) => (
-                    <div key={u.id} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/10">
-                      {editingUser === u.id ? (
-                        <div className="flex-1 flex gap-2">
-                          <input 
-                            type="text"
-                            value={newUser.username}
-                            onChange={(e) => setNewUser({...newUser, username: e.target.value})}
-                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1"
-                          />
-                          <input 
-                            type="password"
-                            value={newUser.password}
-                            onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1"
-                          />
-                          <button 
-                            onClick={async () => {
-                              await updateUser(u.id, newUser);
-                              setEditingUser(null);
-                              setNewUser({ username: '', password: '', role: 'user' });
-                            }}
-                            className="p-1 text-neon-cyan"
-                          >
-                            <Save className="w-5 h-5" />
-                          </button>
-                          <button onClick={() => setEditingUser(null)} className="p-1 text-gray-500">
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <div>
-                            <p className="font-bold">{u.username}</p>
-                            <p className="text-[10px] text-neon-magenta uppercase font-black tracking-widest">{u.role}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <button 
-                              onClick={() => {
-                                setEditingUser(u.id);
-                                setNewUser({ username: u.username, password: '', role: u.role });
-                              }}
-                              className="p-2 text-neon-cyan hover:bg-neon-cyan/10 rounded-lg"
-                            >
-                              <Edit className="w-5 h-5" />
-                            </button>
-                            <button 
-                              onClick={() => deleteUser(u.id)}
-                              className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Database className="w-6 h-6 text-neon-cyan" />
-                Data Migration
-              </h4>
-              <p className="text-gray-400 text-sm font-medium">
-                Migrate legacy data from Firebase to Supabase. This is a one-time operation.
-              </p>
-              <button 
-                onClick={() => window.location.href = '/migrate'}
-                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
-              >
-                <Database className="w-4 h-4" /> Go to Migration Page
-              </button>
-            </div>
-
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Palette className="w-6 h-6 text-neon-magenta" />
+            <div className="bg-white border border-slate-200 p-8 rounded-[32px] space-y-6 shadow-xl">
+              <h4 className="text-xl font-black flex items-center gap-3 text-slate-900">
+                <Palette className="w-6 h-6 text-pink-600" />
                 {t('theme')}
               </h4>
               <div className="grid grid-cols-3 gap-4">
@@ -1457,28 +1354,12 @@ export default function AdminDashboard() {
                   <button 
                     key={t}
                     onClick={() => setTheme(t as any)}
-                    className={`p-4 rounded-2xl border-2 transition-all capitalize font-bold ${theme === t ? 'border-neon-cyan bg-neon-cyan/10' : 'border-white/10 bg-white/5'}`}
+                    className={`p-4 rounded-2xl border-2 transition-all capitalize font-bold ${theme === t ? 'border-teal-600 bg-teal-50 text-teal-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                   >
                     {t}
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Database className="w-6 h-6 text-neon-cyan" />
-                Data Migration
-              </h4>
-              <p className="text-gray-400 text-sm font-medium">
-                Migrate data from the legacy Firebase database to the new Supabase database.
-              </p>
-              <button 
-                onClick={() => window.location.href = '/migrate'}
-                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan font-black py-4 rounded-xl uppercase tracking-widest text-xs hover:bg-neon-cyan/10 transition-all flex items-center justify-center gap-2"
-              >
-                <Database className="w-4 h-4" /> Go to Migration Page
-              </button>
             </div>
           </motion.div>
         )}

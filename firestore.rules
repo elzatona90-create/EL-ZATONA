@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: username, password, role, displayName
+    //
+    // Collection: sections
+    // Fields: title, emoji, slug
+    //
+    // Collection: items
+    // Fields: section_id, title, name, description, attachment_url, created_at
+    //
+    // Collection: prices
+    // Fields: analysis_name, company_name, price, contract_type
+    //
+    // Collection: favorites
+    // Fields: user_id, item_id
+    //
+    // Collection: attachments
+    // Fields: name, url, size, uploaded_by, item_id, section_id
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == "elzatona90@gmail.com");
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.username is string && data.username.size() > 0 &&
+             data.password is string && data.password.size() > 0 &&
+             data.role in ['admin', 'user'];
+    }
+
+    match /users/{userId} {
+      allow read: if true; // Required for custom login system
+      allow create: if isValidUser(request.resource.data) && (request.resource.data.role != 'admin' || isAdmin());
+      allow update: if isValidUser(request.resource.data) && (isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role));
+      allow delete: if isAdmin();
+    }
+
+    match /sections/{sectionId} {
+      allow read: if true;
+      allow create: if true; // Allow initial seeding and setup
+      allow update, delete: if isAdmin();
+    }
+
+    match /items/{itemId} {
+      allow read: if true;
+      allow create: if true; // Allow users to add data in this development phase
+      allow update, delete: if isAdmin();
+    }
+
+    match /prices/{priceId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /favorites/{favoriteId} {
+      allow read: if true; // Allow reading to prevent errors during initial load
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.user_id;
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.user_id;
+    }
+
+    match /attachments/{attachmentId} {
+      allow read: if true; // Required for initial app load
+      allow write: if isAdmin();
+    }
+
+    match /search_logs/{logId} {
+      allow read: if true; // Allow reading to prevent errors during initial load
+      allow create: if true; // Allow logging searches even if not auth
+    }
+  }
+}

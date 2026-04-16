@@ -15,66 +15,46 @@ interface AppState {
   theme: 'teal' | 'pink' | 'blue';
   language: 'en' | 'ar';
   
-  // Auth
   setUser: (user: any) => void;
   logout: () => void;
   updateCurrentUser: (data: any) => Promise<void>;
-
-  // Data
-  fetchData: (force?: boolean) => Promise<void>;
+  fetchData: () => void;
   seedSections: () => Promise<void>;
-  
-  // Sections
   addSection: (section: any) => Promise<void>;
   updateSection: (id: string, section: any) => Promise<void>;
   deleteSection: (id: string) => Promise<void>;
-
-  // Items
   addItem: (item: any) => Promise<void>;
   updateItem: (id: string, item: any) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
-
-  // Prices
   addPrice: (price: any) => Promise<void>;
   updatePrice: (id: string, price: any) => Promise<void>;
   deletePrice: (id: string) => Promise<void>;
-
-  // Favorites
   toggleFavorite: (itemId: string) => Promise<void>;
-
-  // Search Logs
   logSearch: (term: string, section?: string) => void;
   syncSearchLogs: () => Promise<void>;
-
-  // Attachments
   addAttachment: (name: string, url: string, size: number, item_id?: string, section_id?: string) => Promise<void>;
   deleteAttachment: (id: string) => Promise<void>;
-
-  // Users
   addUser: (userData: any) => Promise<void>;
   updateUser: (id: string, userData: any) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
-
-  // UI
   setTheme: (theme: 'teal' | 'pink' | 'blue') => void;
   setLanguage: (lang: 'en' | 'ar') => void;
+  initializeRealtime: () => void;
 }
 
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const SYNC_INTERVAL = 60 * 1000; // 60 seconds
-
-let searchLogQueue: { term: string; section?: string; user_id?: string }[] = [];
+const SYNC_INTERVAL = 60 * 1000;
+let searchLogQueue: any[] = [];
 
 export const useStore = create<AppState>((set, get) => ({
   user: JSON.parse(localStorage.getItem('el_zatona_user') || 'null'),
-  sections: JSON.parse(localStorage.getItem('el_zatona_sections') || '[]'),
-  items: [], // Don't load large datasets from localStorage
+  sections: [],
+  items: [],
   prices: [],
-  favorites: JSON.parse(localStorage.getItem('el_zatona_favorites') || '[]'),
+  favorites: [],
   searchLogs: [],
   attachments: [],
   users: [],
-  lastFetch: Number(localStorage.getItem('el_zatona_last_fetch') || '0'),
+  lastFetch: 0,
   isFetching: false,
   theme: (localStorage.getItem('el_zatona_theme') as any) || 'teal',
   language: (localStorage.getItem('el_zatona_lang') as any) || 'en',
@@ -91,95 +71,71 @@ export const useStore = create<AppState>((set, get) => ({
 
   updateCurrentUser: async (data) => {
     const { user } = get();
-    if (!user) return;
-    const { error } = await supabase.from('users').update(data).eq('id', user.id);
-    if (!error) {
-      const updatedUser = { ...user, ...data };
-      get().setUser(updatedUser);
+    if (!user?.id || isPlaceholder) return;
+    try {
+      const { data: updated, error } = await supabase
+        .from('users')
+        .update(data)
+        .eq('id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      get().setUser(updated);
+    } catch (e) {
+      console.error('Supabase Update Error:', e);
     }
   },
 
-  fetchData: async (force = false) => {
-    const { lastFetch, isFetching } = get();
-    if (isFetching) return;
-
-    const now = Date.now();
-    const CACHE_DURATION = 5 * 60 * 1000; 
-
-    if (!force && now - lastFetch < CACHE_DURATION && get().sections.length > 0) {
+  fetchData: () => {
+    if (isPlaceholder) {
+      console.warn("Supabase is in placeholder mode. Real-time data will not be fetched.");
       return;
     }
 
-    set({ isFetching: true });
-
-    try {
-      const [
-        { data: sections },
-        { data: items },
-        { data: prices },
-        { data: favorites },
-        { data: searchLogs },
-        { data: attachments },
-        { data: users }
-      ] = await Promise.all([
-        supabase.from('sections').select('*'),
-        supabase.from('items').select('*'),
-        supabase.from('prices').select('*'),
-        supabase.from('favorites').select('*'),
-        supabase.from('search_logs').select('*'),
-        supabase.from('attachments').select('*'),
-        supabase.from('users').select('*')
-      ]);
-
-      // If no sections, seed them in background
-      if (!sections || sections.length === 0) {
-        get().seedSections();
-      }
-
-      const dataMap = {
-        sections: sections || [],
-        items: items || [],
-        prices: prices || [],
-        favorites: favorites || [],
-        searchLogs: searchLogs || [],
-        attachments: attachments || [],
-        users: users || [],
-        lastFetch: now,
-        isFetching: false
-      };
-
-      Object.entries(dataMap).forEach(([key, value]) => {
-        // Only cache small, essential datasets in localStorage
-        // Large datasets (items, prices, attachments, searchLogs, users) are excluded to avoid quota errors
-        if (['sections', 'favorites', 'lastFetch'].includes(key)) {
-          localStorage.setItem(`el_zatona_${key}`, JSON.stringify(value));
-        } else {
-          // Explicitly remove large keys to free up space
-          localStorage.removeItem(`el_zatona_${key}`);
+    const tables = ['sections', 'items', 'prices', 'favorites', 'attachments', 'users', 'search_logs'];
+    
+    // Initial fetch for all tables
+    tables.forEach(async (table) => {
+      const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
+      if (!error && data) {
+        const stateKey = table === 'search_logs' ? 'searchLogs' : table;
+        set({ [stateKey]: data } as any);
+        
+        if (table === 'sections' && data.length === 0) {
+          get().seedSections();
         }
-      });
-
-      set(dataMap);
-
-      // Set up real-time subscriptions if not already set
-      if (!(window as any).supabaseSubscriptions) {
-        const channels = [
-          supabase.channel('sections-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, () => get().fetchData(true)).subscribe(),
-          supabase.channel('items-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => get().fetchData(true)).subscribe(),
-          supabase.channel('prices-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'prices' }, () => get().fetchData(true)).subscribe(),
-          supabase.channel('favorites-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'favorites' }, () => get().fetchData(true)).subscribe(),
-          supabase.channel('attachments-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'attachments' }, () => get().fetchData(true)).subscribe(),
-          supabase.channel('users-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => get().fetchData(true)).subscribe()
-        ];
-        (window as any).supabaseSubscriptions = channels;
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      set({ isFetching: false });
-    }
+    });
+  },
+
+  initializeRealtime: () => {
+    if (isPlaceholder) return;
+    
+    // Real-time subscription
+    supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+        const { table, eventType, new: newRecord, old: oldRecord } = payload;
+        const stateKey = table === 'search_logs' ? 'searchLogs' : (table as string);
+        const currentData = (get() as any)[stateKey] || [];
+
+        let updatedData = [...currentData];
+        if (eventType === 'INSERT') {
+          updatedData = [newRecord, ...updatedData];
+        } else if (eventType === 'UPDATE') {
+          updatedData = updatedData.map((item: any) => item.id === newRecord.id ? newRecord : item);
+        } else if (eventType === 'DELETE') {
+          updatedData = updatedData.filter((item: any) => item.id !== oldRecord.id);
+        }
+
+        set({ [stateKey]: updatedData } as any);
+      })
+      .subscribe();
   },
 
   seedSections: async () => {
+    if (isPlaceholder) return;
     const initialSections = [
       { title: 'Contracts', emoji: '📄', slug: 'contracts' },
       { title: 'Prices', emoji: '💰', slug: 'prices' },
@@ -192,161 +148,115 @@ export const useStore = create<AppState>((set, get) => ({
       { title: 'Applications Section', emoji: '📂', slug: 'applications_section' }
     ];
     
-    const { error } = await supabase.from('sections').insert(initialSections);
-    if (error) {
-      console.error("Error seeding sections:", error);
-      // Fallback to local if supabase fails
-      const currentSections = get().sections;
-      const newSections = [...currentSections];
-      initialSections.forEach(is => {
-        if (!newSections.find(s => s.slug === is.slug)) {
-          newSections.push({ ...is, id: crypto.randomUUID() });
-        }
-      });
-      set({ sections: newSections });
-      localStorage.setItem('el_zatona_sections', JSON.stringify(newSections));
-    } else {
-      await get().fetchData(true);
+    // Check if sections already exist to avoid double seeding
+    const { data: existing } = await supabase.from('sections').select('slug');
+    const existingSlugs = new Set(existing?.map(s => s.slug) || []);
+    
+    const toInsert = initialSections.filter(s => !existingSlugs.has(s.slug));
+    if (toInsert.length > 0) {
+      const { error } = await supabase.from('sections').insert(toInsert);
+      if (error) console.error('Supabase Seed Error:', error);
     }
   },
 
   addSection: async (section) => {
-    const sectionWithId = { ...section, id: crypto.randomUUID() };
+    if (isPlaceholder) return;
     const { error } = await supabase.from('sections').insert([section]);
-    
-    // Always update local state for immediate feedback and offline support
-    const newSections = [...get().sections, sectionWithId];
-    set({ sections: newSections });
-    localStorage.setItem('el_zatona_sections', JSON.stringify(newSections));
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Insert Error:', error);
   },
 
   updateSection: async (id, section) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('sections').update(section).eq('id', id);
-    
-    const newSections = get().sections.map(s => s.id === id ? { ...s, ...section } : s);
-    set({ sections: newSections });
-    localStorage.setItem('el_zatona_sections', JSON.stringify(newSections));
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Update Error:', error);
   },
 
   deleteSection: async (id) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('sections').delete().eq('id', id);
-    
-    const newSections = get().sections.filter(s => s.id !== id);
-    set({ sections: newSections });
-    localStorage.setItem('el_zatona_sections', JSON.stringify(newSections));
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Delete Error:', error);
   },
 
   addItem: async (item) => {
-    const itemWithId = { ...item, id: crypto.randomUUID(), created_at: new Date().toISOString() };
-    const { error } = await supabase.from('items').insert([item]);
-    
-    const newItems = [...get().items, itemWithId];
-    set({ items: newItems });
-    
-    if (!error) get().fetchData(true);
+    if (isPlaceholder) return;
+    const { error } = await supabase.from('items').insert([{ ...item, created_at: new Date().toISOString() }]);
+    if (error) console.error('Supabase Insert Error:', error);
   },
 
   updateItem: async (id, item) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('items').update(item).eq('id', id);
-    
-    const newItems = get().items.map(i => i.id === id ? { ...i, ...item } : i);
-    set({ items: newItems });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Update Error:', error);
   },
 
   deleteItem: async (id) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('items').delete().eq('id', id);
-    
-    const newItems = get().items.filter(i => i.id !== id);
-    set({ items: newItems });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Delete Error:', error);
   },
 
   addPrice: async (price) => {
-    const priceWithId = { ...price, id: crypto.randomUUID() };
+    if (isPlaceholder) return;
     const { error } = await supabase.from('prices').insert([price]);
-    
-    const newPrices = [...get().prices, priceWithId];
-    set({ prices: newPrices });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Insert Error:', error);
   },
 
   updatePrice: async (id, price) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('prices').update(price).eq('id', id);
-    
-    const newPrices = get().prices.map(p => p.id === id ? { ...p, ...price } : p);
-    set({ prices: newPrices });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Update Error:', error);
   },
 
   deletePrice: async (id) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('prices').delete().eq('id', id);
-    
-    const newPrices = get().prices.filter(p => p.id !== id);
-    set({ prices: newPrices });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Delete Error:', error);
   },
 
   toggleFavorite: async (itemId) => {
+    if (isPlaceholder) return;
     const { user, favorites } = get();
-    if (!user) return;
+    if (!user?.id) return;
 
     const existing = favorites.find(f => f.item_id === itemId && f.user_id === user.id);
     if (existing) {
       await supabase.from('favorites').delete().eq('id', existing.id);
-      const newFavorites = favorites.filter(f => f.id !== existing.id);
-      set({ favorites: newFavorites });
-      localStorage.setItem('el_zatona_favorites', JSON.stringify(newFavorites));
     } else {
-      const newFav = { id: crypto.randomUUID(), user_id: user.id, item_id: itemId };
-      await supabase.from('favorites').insert([newFav]);
-      const newFavorites = [...favorites, newFav];
-      set({ favorites: newFavorites });
-      localStorage.setItem('el_zatona_favorites', JSON.stringify(newFavorites));
+      await supabase.from('favorites').insert([{ user_id: user.id, item_id: itemId }]);
     }
-    get().fetchData(true);
   },
 
   logSearch: (term, section) => {
     const { user } = get();
-    searchLogQueue.push({ term, section, user_id: user?.id });
+    searchLogQueue.push({ search_term: term, section, user_id: user?.id, last_searched_at: new Date().toISOString() });
   },
 
   syncSearchLogs: async () => {
-    if (searchLogQueue.length === 0) return;
-    
+    if (isPlaceholder || searchLogQueue.length === 0) return;
     const logs = [...searchLogQueue];
     searchLogQueue = [];
+    
+    for (const log of logs) {
+      const { data: existing } = await supabase
+        .from('search_logs')
+        .select('*')
+        .eq('search_term', log.search_term)
+        .eq('user_id', log.user_id)
+        .single();
 
-    // Group by term and section to increment counts if needed, 
-    // but for analytics we might want individual logs or a summary.
-    // Here we just insert them.
-    const { error } = await supabase.from('search_logs').insert(logs.map(l => ({
-      search_term: l.term,
-      section: l.section,
-      user_id: l.user_id
-    })));
-
-    if (error) {
-      console.error("Error syncing search logs:", error);
-      searchLogQueue = [...logs, ...searchLogQueue];
-    } else {
-      get().fetchData(true);
+      if (existing) {
+        await supabase
+          .from('search_logs')
+          .update({ count: (existing.count || 1) + 1, last_searched_at: new Date().toISOString() })
+          .eq('id', existing.id);
+      } else {
+        await supabase.from('search_logs').insert([log]);
+      }
     }
   },
 
   addAttachment: async (name, url, size, item_id, section_id) => {
+    if (isPlaceholder) return;
     const { user } = get();
     const { error } = await supabase.from('attachments').insert([{ 
       name, 
@@ -354,42 +264,34 @@ export const useStore = create<AppState>((set, get) => ({
       size, 
       uploaded_by: user?.id,
       item_id,
-      section_id
+      section_id,
+      created_at: new Date().toISOString()
     }]);
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Insert Error:', error);
   },
 
   deleteAttachment: async (id) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('attachments').delete().eq('id', id);
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Delete Error:', error);
   },
 
   addUser: async (userData) => {
-    const userWithId = { ...userData, id: crypto.randomUUID() };
+    if (isPlaceholder) return;
     const { error } = await supabase.from('users').insert([userData]);
-    
-    const newUsers = [...get().users, userWithId];
-    set({ users: newUsers });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Insert Error:', error);
   },
 
   updateUser: async (id, userData) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('users').update(userData).eq('id', id);
-    
-    const newUsers = get().users.map(u => u.id === id ? { ...u, ...userData } : u);
-    set({ users: newUsers });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Update Error:', error);
   },
 
   deleteUser: async (id) => {
+    if (isPlaceholder) return;
     const { error } = await supabase.from('users').delete().eq('id', id);
-    
-    const newUsers = get().users.filter(u => u.id !== id);
-    set({ users: newUsers });
-    
-    if (!error) get().fetchData(true);
+    if (error) console.error('Supabase Delete Error:', error);
   },
 
   setTheme: (theme) => {
@@ -403,7 +305,6 @@ export const useStore = create<AppState>((set, get) => ({
   }
 }));
 
-// Start sync interval
 setInterval(() => {
   useStore.getState().syncSearchLogs();
 }, SYNC_INTERVAL);

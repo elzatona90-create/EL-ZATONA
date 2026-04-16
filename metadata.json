@@ -1,6 +1,6 @@
 {
   "name": "EL ZATONA",
-  "description": "A high-performance dashboard with AI search, RTL support, and optimized Firebase caching.",
+  "description": "A high-performance dashboard with AI search, RTL support, and real-time database powered by Supabase.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
