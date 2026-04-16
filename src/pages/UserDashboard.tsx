@@ -169,14 +169,22 @@ export default function UserDashboard() {
                       <div key={item.id} className="item-card-vertical !border-l-0 !p-4 !rounded-[20px] bg-[#1a1f35]/60 border border-white/10">
                         <div className="space-y-3">
                           <div className="flex justify-between items-start gap-2">
-                            <div className="space-y-0.5">
+                            <div className="flex-1 space-y-0.5">
                               <p className="text-[7px] font-black text-neon-cyan tracking-[0.1em] uppercase">NAME</p>
                               <div className="inline-block px-3 py-0.5 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20">
                                 <h4 className="text-sm font-black text-neon-cyan">{item.title || item.name}</h4>
                               </div>
                             </div>
-                            <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
-                              {item.section?.title || item.section?.name}
+                            <div className="flex flex-col items-end gap-2">
+                              <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
+                                {item.section?.title || item.section?.name}
+                              </div>
+                              <button 
+                                onClick={() => toggleFavorite(item.id)}
+                                className={`p-1.5 rounded-lg transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta bg-neon-magenta/10' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                              >
+                                <Star className={`w-3.5 h-3.5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
+                              </button>
                             </div>
                           </div>
 
