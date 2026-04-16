@@ -139,15 +139,15 @@ export default function UserDashboard() {
             </div>
 
             {/* AI Search Assistant Card */}
-            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] mx-auto w-full max-w-[360px] h-[700px] md:h-[750px]">
-              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md shrink-0">
+            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] neon-glow-pink-subtle mx-auto w-full max-w-[360px] h-[700px] md:h-[750px]">
+              <div className="p-4 border-b border-neon-magenta/20 flex justify-between items-center bg-white/5 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
-                    <MessageSquare className="w-5 h-5 text-neon-cyan" />
+                  <div className="w-10 h-10 rounded-xl bg-neon-magenta/10 flex items-center justify-center border border-neon-magenta/20 shadow-[0_0_10px_rgba(255,0,127,0.2)]">
+                    <MessageSquare className="w-5 h-5 text-neon-magenta" />
                   </div>
                   <div>
                     <h3 className="font-black text-lg text-white leading-none">Al Assistant</h3>
-                    <p className="text-[8px] font-black text-gray-500 tracking-[0.1em] uppercase">BY ISLAM AL SAPAA</p>
+                    <p className="text-[8px] font-black text-neon-magenta/60 tracking-[0.1em] uppercase">BY ISLAM AL SAPAA</p>
                   </div>
                 </div>
                 <button onClick={() => { setAiResponse(null); setGlobalSearchResults([]); }} className="text-gray-600 hover:text-white transition-colors p-1">
@@ -218,9 +218,9 @@ export default function UserDashboard() {
               </div>
 
               {/* Search Input Area */}
-              <div className="p-4 pt-2 bg-dark-bg/40 backdrop-blur-sm border-t border-white/5">
+              <div className="p-4 pt-2 bg-dark-bg/40 backdrop-blur-sm border-t border-neon-magenta/10">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 flex items-center gap-3 bg-[#1a1f35] rounded-[20px] px-4 py-3 border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,242,255,0.1)] focus-within:shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all">
+                  <div className="flex-1 flex items-center gap-3 bg-[#1a1f35] rounded-[20px] px-4 py-3 border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,242,255,0.1)] focus-within:shadow-[0_0_15px_rgba(255,0,127,0.2)] focus-within:border-neon-magenta/50 transition-all">
                     <input 
                       type="text"
                       value={searchQuery}
@@ -229,7 +229,7 @@ export default function UserDashboard() {
                       placeholder="Ask me..."
                       className="flex-1 bg-transparent focus:outline-none text-sm font-bold text-white placeholder:text-gray-600"
                     />
-                    <button className="p-1 text-gray-500 hover:text-neon-cyan transition-colors">
+                    <button className="p-1 text-gray-500 hover:text-neon-magenta transition-colors">
                       <Mic className="w-5 h-5" />
                     </button>
                   </div>
