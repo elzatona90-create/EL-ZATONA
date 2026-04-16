@@ -1,7 +1,9 @@
 const CACHE_NAME = 'el-zatona-cache-v1';
 const urlsToCache = [
   '/',
-  '/index.html'
+  '/index.html',
+  '/manifest.json',
+  '/logo.png'
 ];
 
 self.addEventListener('install', event => {
