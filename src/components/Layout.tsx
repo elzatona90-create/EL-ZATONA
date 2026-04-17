@@ -66,9 +66,6 @@ export default function Layout({
 
   return (
     <div className="min-h-screen pb-32 relative overflow-x-hidden">
-      {/* Dynamic Glass Neon Border */}
-      <div className="app-neon-border"></div>
-      
       {/* Subtle Animated Background Shine */}
       <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-blue rounded-full blur-[120px] animate-pulse"></div>
