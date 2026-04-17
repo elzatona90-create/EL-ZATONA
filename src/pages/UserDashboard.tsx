@@ -118,8 +118,20 @@ export default function UserDashboard() {
      (item.description || '').toLowerCase().includes(sectionSearch.toLowerCase()))
   );
 
+  const handleSetSelectedSection = (sectionId: string | null) => {
+    if (sectionId !== selectedSection) {
+      window.history.pushState({ tab: activeTab, sub: sectionId }, '', '');
+      setSelectedSection(sectionId);
+    }
+  };
+
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout 
+      activeTab={activeTab} 
+      setActiveTab={setActiveTab}
+      selectedSubState={selectedSection}
+      setSelectedSubState={setSelectedSection}
+    >
       <AnimatePresence mode="wait">
         {activeTab === 'home' && (
           <motion.div 
@@ -130,7 +142,7 @@ export default function UserDashboard() {
             className="space-y-8"
           >
             <div className="space-y-0.5 text-center">
-              <h2 className="text-2xl font-black neon-text-cyan tracking-tight">
+              <h2 className="text-2xl font-black neon-text-blue tracking-tight">
                 Welcome Back, {user?.username}!
               </h2>
               <p className="text-gray-400 font-medium tracking-tight text-sm">
@@ -139,15 +151,18 @@ export default function UserDashboard() {
             </div>
 
             {/* AI Search Assistant Card */}
-            <div className="glass-morphism rounded-[32px] border-2 border-neon-cyan/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,242,255,0.15)] mx-auto w-full max-w-md min-h-[500px]">
-              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md">
+            <div className="glass-morphism rounded-[32px] border-2 border-neon-blue/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,102,255,0.15)] mx-auto w-full max-w-md min-h-[500px]">
+              <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md relative">
+                {/* Pink neon line at top of assistant card */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-70"></div>
+                
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
-                    <MessageSquare className="w-5 h-5 text-neon-cyan" />
+                  <div className="w-10 h-10 rounded-xl bg-neon-pink/10 flex items-center justify-center border border-neon-pink/20">
+                    <MessageSquare className="w-5 h-5 text-neon-pink" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-white leading-none">Al Assistant</h3>
-                    <p className="text-[8px] font-black text-gray-500 tracking-[0.1em] uppercase">BY ISLAM AL SAPAA</p>
+                    <h3 className="font-black text-lg text-white leading-none">{t('ai_assistant')}</h3>
+                    <p className="text-[8px] font-black text-neon-pink tracking-[0.1em] uppercase">BY ISLAM AL SAPAA</p>
                   </div>
                 </div>
                 <button onClick={() => { setAiResponse(null); setGlobalSearchResults([]); }} className="text-gray-600 hover:text-white transition-colors p-1">
@@ -158,21 +173,21 @@ export default function UserDashboard() {
               <div className="p-4 flex-1 flex flex-col gap-4">
                 <div className="bg-[#1a1f35]/80 p-5 rounded-[24px] border border-white/5 relative shadow-inner">
                   <p className="text-base font-bold leading-relaxed text-white">
-                    {aiResponse || "Hello! Type a keyword to search."}
+                    {aiResponse || t('ai_greeting')}
                   </p>
                 </div>
 
                 {globalSearchResults.length > 0 && (
                   <div className="space-y-3 pb-4">
-                    <p className="text-[10px] font-black text-neon-cyan uppercase tracking-[0.2em] px-2">Results</p>
+                    <p className="text-[10px] font-black text-neon-blue uppercase tracking-[0.2em] px-2">Results</p>
                     {globalSearchResults.map((item) => (
                       <div key={item.id} className="item-card-vertical !border-l-0 !p-4 !rounded-[20px] bg-[#1a1f35]/60 border border-white/10">
                         <div className="space-y-3">
                           <div className="flex justify-between items-start gap-2">
                             <div className="space-y-0.5">
-                              <p className="text-[7px] font-black text-neon-cyan tracking-[0.1em] uppercase">NAME</p>
-                              <div className="inline-block px-3 py-0.5 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20">
-                                <h4 className="text-sm font-black text-neon-cyan">{item.title || item.name}</h4>
+                              <p className="text-[7px] font-black text-neon-blue tracking-[0.1em] uppercase">NAME</p>
+                              <div className="inline-block px-3 py-0.5 rounded-lg bg-neon-blue/10 border border-neon-blue/20">
+                                <h4 className="text-sm font-black text-neon-blue">{item.title || item.name}</h4>
                               </div>
                             </div>
                             <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
@@ -181,7 +196,7 @@ export default function UserDashboard() {
                           </div>
 
                           <div className="space-y-1">
-                            <p className="text-[7px] font-black text-neon-cyan tracking-[0.1em] uppercase">DESCRIPTION</p>
+                            <p className="text-[7px] font-black text-neon-blue tracking-[0.1em] uppercase">DESCRIPTION</p>
                             <div className="space-y-0.5">
                               {item.description?.split('\n').map((line: string, i: number) => (
                                 <p key={i} className="text-xs font-bold text-white leading-tight">
@@ -196,7 +211,7 @@ export default function UserDashboard() {
                               href={item.attachment_url} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="inline-flex items-center gap-2 bg-neon-cyan/5 border border-neon-cyan/30 text-neon-cyan font-black tracking-widest text-[7px] uppercase px-3 py-1.5 rounded-full hover:bg-neon-cyan/20 transition-all w-fit"
+                              className="inline-flex items-center gap-2 bg-neon-blue/5 border border-neon-blue/30 text-neon-blue font-black tracking-widest text-[7px] uppercase px-3 py-1.5 rounded-full hover:bg-neon-blue/20 transition-all w-fit"
                             >
                               <Paperclip className="w-3 h-3" />
                               VIEW
@@ -212,7 +227,7 @@ export default function UserDashboard() {
               {/* Search Input Area */}
               <div className="p-4 pt-2 bg-dark-bg/40 backdrop-blur-sm border-t border-white/5">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 flex items-center gap-3 bg-[#1a1f35] rounded-[20px] px-4 py-3 border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,242,255,0.1)] focus-within:shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all">
+                  <div className="flex-1 flex items-center gap-3 bg-[#1a1f35] rounded-[20px] px-4 py-3 border border-neon-blue/30 shadow-[0_0_10px_rgba(0,102,255,0.1)] focus-within:shadow-[0_0_15px_rgba(255,0,127,0.3)] focus-within:border-neon-pink/50 transition-all">
                     <input 
                       type="text"
                       value={searchQuery}
@@ -221,14 +236,14 @@ export default function UserDashboard() {
                       placeholder="Ask me..."
                       className="flex-1 bg-transparent focus:outline-none text-sm font-bold text-white placeholder:text-gray-600"
                     />
-                    <button className="p-1 text-gray-500 hover:text-neon-cyan transition-colors">
+                    <button className="p-1 text-gray-500 hover:text-neon-blue transition-colors">
                       <Mic className="w-5 h-5" />
                     </button>
                   </div>
                   <button 
                     onClick={handleAISearch}
                     disabled={isAiLoading}
-                    className="p-3.5 bg-gradient-to-br from-neon-cyan to-neon-magenta text-white rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-50"
+                    className="p-3.5 bg-gradient-to-br from-neon-blue to-neon-pink text-white rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-50"
                   >
                     <Send className={`w-4 h-4 ${isAiLoading ? 'animate-pulse' : ''}`} />
                   </button>
@@ -246,7 +261,7 @@ export default function UserDashboard() {
             className="space-y-8"
           >
             <div className="space-y-1">
-              <h2 className="text-4xl font-black neon-text-cyan uppercase tracking-tight">
+              <h2 className="text-4xl font-black neon-text-blue uppercase tracking-tight">
                 {t('global_search')}
               </h2>
               <p className="text-gray-400 font-medium tracking-tight">
@@ -255,7 +270,7 @@ export default function UserDashboard() {
             </div>
 
             <div className="relative">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-neon-cyan" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-neon-blue" />
               <input 
                 type="text"
                 value={searchQuery}
@@ -286,7 +301,7 @@ export default function UserDashboard() {
                   setGlobalSearchResults([...itemResults, ...priceResults]);
                 }}
                 placeholder="Search everything..."
-                className="w-full glass-morphism border border-neon-cyan/50 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-neon-cyan transition-all text-lg"
+                className="w-full glass-morphism border border-neon-blue/50 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-neon-blue transition-all text-lg"
               />
             </div>
 
@@ -295,21 +310,21 @@ export default function UserDashboard() {
                 <div key={item.id} className="item-card-vertical">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
+                      <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">
                         {item.section?.emoji} {item.section?.title || item.section?.name}
                       </p>
                       <h4 className="text-xl font-black text-white">{item.title || item.name}</h4>
                     </div>
                     <button 
                       onClick={() => toggleFavorite(item.id)}
-                      className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
+                      className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-pink' : 'text-gray-500 hover:text-white'}`}
                     >
                       <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
                     </button>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
+                    <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase">DESCRIPTION</p>
                     <div className="space-y-1">
                       {item.description?.split('\n').map((line: string, i: number) => (
                         <p key={i} className="description-text">
@@ -325,7 +340,7 @@ export default function UserDashboard() {
                         href={item.attachment_url} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 bg-neon-cyan/10 text-neon-cyan font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-cyan/20 transition-all"
+                        className="inline-flex items-center gap-2 bg-neon-blue/10 text-neon-blue font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-blue/20 transition-all"
                       >
                         <Paperclip className="w-4 h-4" />
                         {t('view_attachment')}
@@ -357,15 +372,15 @@ export default function UserDashboard() {
                   {sections.map((section) => (
                     <button 
                       key={section.id}
-                      onClick={() => setSelectedSection(section.id)}
-                      className="w-full glass-morphism p-5 rounded-2xl flex justify-between items-center group hover:border-neon-cyan/80 transition-all"
+                      onClick={() => handleSetSelectedSection(section.id)}
+                      className="w-full glass-morphism p-5 rounded-2xl flex justify-between items-center group hover:border-neon-blue/80 transition-all"
                     >
                       <div className="flex items-center gap-4">
-                        <FileText className="w-5 h-5 text-neon-cyan" />
+                        <FileText className="w-5 h-5 text-neon-blue" />
                         <span className="text-lg font-bold tracking-tight text-white">{section.title || section.name}</span>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-neon-cyan/20 transition-all">
-                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-neon-cyan" />
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-neon-blue/20 transition-all">
+                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-neon-blue" />
                       </div>
                     </button>
                   ))}
@@ -374,17 +389,17 @@ export default function UserDashboard() {
             ) : (
               <div className="space-y-6">
                 <button 
-                  onClick={() => setSelectedSection(null)}
-                  className="flex items-center gap-2 text-neon-cyan font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-all"
+                  onClick={() => window.history.back()}
+                  className="flex items-center gap-2 text-neon-blue font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-all"
                 >
                   <ArrowLeft className="w-4 h-4" /> BACK TO SECTIONS
                 </button>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/20">
-                    <FileText className="w-6 h-6 text-neon-cyan" />
+                  <div className="w-12 h-12 rounded-2xl bg-neon-blue/10 flex items-center justify-center border border-neon-blue/20">
+                    <FileText className="w-6 h-6 text-neon-blue" />
                   </div>
-                  <h3 className="text-3xl font-black text-neon-cyan tracking-tight">
+                  <h3 className="text-3xl font-black text-neon-blue tracking-tight">
                     {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
                   </h3>
                 </div>
@@ -392,7 +407,7 @@ export default function UserDashboard() {
                 {sections.find(s => s.id === selectedSection)?.slug === 'prices' && (
                   <div className="glass-morphism p-8 rounded-[32px] space-y-6">
                     <h4 className="text-xl font-black flex items-center gap-3">
-                      <Calculator className="w-6 h-6 text-neon-cyan" />
+                      <Calculator className="w-6 h-6 text-neon-blue" />
                       {t('calculate')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -401,8 +416,8 @@ export default function UserDashboard() {
                         <select 
                           value={calcAnalysis}
                           onChange={(e) => setCalcAnalysis(e.target.value)}
-                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                         >
                           <option value="" className="bg-dark-bg">{t('select_analysis')}</option>
                           {[...new Set(prices.map(p => p.analysis_name))].map(name => (
@@ -415,8 +430,8 @@ export default function UserDashboard() {
                         <select 
                           value={calcCompany}
                           onChange={(e) => setCalcCompany(e.target.value)}
-                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                         >
                           <option value="" className="bg-dark-bg">{t('select_company')}</option>
                           {[...new Set(prices.map(p => p.company_name))].map(name => (
@@ -429,8 +444,8 @@ export default function UserDashboard() {
                         <select 
                           value={calcContract}
                           onChange={(e) => setCalcContract(e.target.value)}
-                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                         >
                           <option value="" className="bg-dark-bg">{t('select_contract')}</option>
                           {[...new Set(prices.map(p => p.contract_type))].map(type => (
@@ -442,7 +457,7 @@ export default function UserDashboard() {
                     <div className="flex gap-2">
                       <button 
                         onClick={handleAddTest}
-                        className="flex-1 bg-neon-cyan text-dark-bg font-black py-4 rounded-xl uppercase tracking-widest"
+                        className="flex-1 bg-neon-blue text-dark-bg font-black py-4 rounded-xl uppercase tracking-widest"
                       >
                         Add
                       </button>
@@ -463,7 +478,7 @@ export default function UserDashboard() {
                       <div className="space-y-4 pt-4 border-t border-white/10">
                         <div className="flex justify-between items-center">
                           <span className="text-gray-400 font-bold">{t('total')}</span>
-                          <span className="text-2xl font-black text-neon-cyan">
+                          <span className="text-2xl font-black text-neon-blue">
                             {invoiceItems.reduce((acc, curr) => acc + parseFloat(curr.price), 0).toFixed(2)}
                           </span>
                         </div>
@@ -475,7 +490,7 @@ export default function UserDashboard() {
                                 <p className="text-[10px] text-gray-400">{res.company_name} - {res.contract_type}</p>
                               </div>
                               <div className="flex items-center gap-4">
-                                <span className="font-black text-neon-magenta">{res.price}</span>
+                                <span className="font-black text-neon-pink">{res.price}</span>
                                 <button 
                                   onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== idx))}
                                   className="text-gray-500 hover:text-red-400 transition-colors"
@@ -492,13 +507,13 @@ export default function UserDashboard() {
                 )}
 
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-cyan" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-blue" />
                   <input 
                     type="text"
                     value={sectionSearch}
                     onChange={(e) => setSectionSearch(e.target.value)}
                     placeholder="Search..."
-                    className="w-full glass-morphism border border-neon-cyan/50 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-neon-cyan transition-all text-white placeholder-gray-500"
+                    className="w-full glass-morphism border border-neon-blue/50 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-neon-blue transition-all text-white placeholder-gray-500"
                   />
                 </div>
 
@@ -507,14 +522,14 @@ export default function UserDashboard() {
                     <div key={item.id} className="item-card-vertical !border-l-0 !p-8 !rounded-[40px] bg-[#1a1f35]/60 border border-white/10">
                       <div className="space-y-6">
                         <div className="space-y-2">
-                          <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">NAME</p>
-                          <div className="inline-block px-6 py-2 rounded-2xl bg-neon-cyan/10 border border-neon-cyan/30">
-                            <h4 className="text-2xl font-black text-neon-cyan">{item.title}</h4>
+                          <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">NAME</p>
+                          <div className="inline-block px-6 py-2 rounded-2xl bg-neon-blue/10 border border-neon-blue/30">
+                            <h4 className="text-2xl font-black text-neon-blue">{item.title}</h4>
                           </div>
                         </div>
 
                         <div className="space-y-3">
-                          <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">DESCRIPTION</p>
+                          <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">DESCRIPTION</p>
                           <div className="space-y-2">
                             {item.description?.split('\n').map((line: string, i: number) => (
                               <p key={i} className="text-lg font-bold text-white leading-relaxed">
@@ -532,12 +547,12 @@ export default function UserDashboard() {
 
                         {item.attachment_url && (
                           <div className="space-y-3 pt-2">
-                            <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">ATTACHMENT</p>
+                            <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">ATTACHMENT</p>
                             <a 
                               href={item.attachment_url} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="inline-flex items-center gap-3 bg-neon-cyan/5 border border-neon-cyan/30 text-neon-cyan font-black tracking-widest text-[10px] uppercase px-6 py-3 rounded-full hover:bg-neon-cyan/20 transition-all"
+                              className="inline-flex items-center gap-3 bg-neon-blue/5 border border-neon-blue/30 text-neon-blue font-black tracking-widest text-[10px] uppercase px-6 py-3 rounded-full hover:bg-neon-blue/20 transition-all"
                             >
                               <Paperclip className="w-4 h-4" />
                               VIEW ATTACHMENT
@@ -561,7 +576,7 @@ export default function UserDashboard() {
             className="space-y-8"
           >
             <div className="space-y-1">
-              <h2 className="text-4xl font-black neon-text-magenta uppercase tracking-tight">
+              <h2 className="text-4xl font-black neon-text-pink uppercase tracking-tight">
                 {t('favorites')}
               </h2>
               <p className="text-gray-400 font-medium tracking-tight">
@@ -571,24 +586,24 @@ export default function UserDashboard() {
 
             <div className="space-y-6">
               {items.filter(i => favorites.some(f => f.item_id === i.id && f.user_id === user?.id)).map((item) => (
-                <div key={item.id} className="item-card-vertical border-neon-magenta neon-border-magenta">
+                <div key={item.id} className="item-card-vertical border-neon-pink neon-border-pink">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">
+                      <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase">
                         {sections.find(s => s.id === item.section_id)?.emoji} {sections.find(s => s.id === item.section_id)?.title || sections.find(s => s.id === item.section_id)?.name}
                       </p>
                       <h4 className="text-xl font-black text-white">{item.title}</h4>
                     </div>
                     <button 
                       onClick={() => toggleFavorite(item.id)}
-                      className="p-2 rounded-xl transition-all text-neon-magenta hover:bg-white/5"
+                      className="p-2 rounded-xl transition-all text-neon-pink hover:bg-white/5"
                     >
                       <Star className="w-5 h-5 fill-current" />
                     </button>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
+                    <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase">DESCRIPTION</p>
                     <div className="space-y-1">
                       {item.description?.split('\n').map((line: string, i: number) => (
                         <p key={i} className="description-text">
@@ -600,12 +615,12 @@ export default function UserDashboard() {
 
                   {item.attachment_url && (
                     <div className="pt-2">
-                      <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
+                      <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
                       <a 
                         href={item.attachment_url} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 bg-neon-magenta/10 text-neon-magenta font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-magenta/20 transition-all"
+                        className="inline-flex items-center gap-2 bg-neon-pink/10 text-neon-pink font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-pink/20 transition-all"
                       >
                         <Paperclip className="w-4 h-4" />
                         {t('view_attachment')}
@@ -632,13 +647,13 @@ export default function UserDashboard() {
             exit={{ opacity: 0, x: -20 }}
             className="space-y-8"
           >
-            <h3 className="text-3xl font-black neon-text-cyan">{t('attachments')}</h3>
+            <h3 className="text-3xl font-black neon-text-blue">{t('attachments')}</h3>
             <div className="grid grid-cols-1 gap-6">
               {attachments.map((file) => (
-                <div key={file.id} className="glass-morphism p-8 rounded-[32px] space-y-6 border border-white/5 hover:border-neon-magenta/30 transition-all group">
+                <div key={file.id} className="glass-morphism p-8 rounded-[32px] space-y-6 border border-white/5 hover:border-neon-pink/30 transition-all group">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-magenta/10 transition-all">
-                      <FileText className="w-8 h-8 text-neon-magenta" />
+                    <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-pink/10 transition-all">
+                      <FileText className="w-8 h-8 text-neon-pink" />
                     </div>
                     <div>
                       <h4 className="text-xl font-black truncate max-w-[200px] text-white">{file.name}</h4>
@@ -651,7 +666,7 @@ export default function UserDashboard() {
                     href={file.url} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="w-full glass-morphism bg-white/5 py-5 rounded-[24px] flex items-center justify-center gap-3 font-black tracking-widest text-xs uppercase hover:bg-neon-cyan/20 hover:text-neon-cyan transition-all border border-white/10"
+                    className="w-full glass-morphism bg-white/5 py-5 rounded-[24px] flex items-center justify-center gap-3 font-black tracking-widest text-xs uppercase hover:bg-neon-blue/20 hover:text-neon-blue transition-all border border-white/10"
                   >
                     <Paperclip className="w-5 h-5" />
                     {t('view_document')}
@@ -671,20 +686,20 @@ export default function UserDashboard() {
             className="max-w-md mx-auto space-y-8"
           >
             <div className="glass-morphism p-8 rounded-[32px] text-center space-y-6">
-              <div className="w-32 h-32 rounded-full border-4 border-neon-cyan p-1 mx-auto">
+              <div className="w-32 h-32 rounded-full border-4 border-neon-blue p-1 mx-auto shadow-[0_0_20px_rgba(0,102,255,0.2)]">
                 <div className="w-full h-full rounded-full bg-dark-bg flex items-center justify-center overflow-hidden">
-                  <User className="w-16 h-16 text-neon-cyan" />
+                  <User className="w-16 h-16 text-neon-blue" />
                 </div>
               </div>
               <div>
-                <h3 className="text-2xl font-black">{user?.username}</h3>
-                <p className="text-neon-magenta font-bold uppercase tracking-widest text-xs">{user?.role}</p>
+                <h3 className="text-2xl font-black text-white">{user?.username}</h3>
+                <p className="text-neon-pink font-bold uppercase tracking-widest text-xs">{user?.role}</p>
               </div>
             </div>
 
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
-                <Settings className="w-6 h-6 text-neon-cyan" />
+                <Settings className="w-6 h-6 text-neon-blue" />
                 {t('settings')}
               </h4>
               
@@ -696,7 +711,7 @@ export default function UserDashboard() {
                     value={profileUpdate.username}
                     onChange={(e) => setProfileUpdate({...profileUpdate, username: e.target.value})}
                     placeholder="New Username"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all text-white"
                   />
                   <button 
                     onClick={async () => {
@@ -705,17 +720,17 @@ export default function UserDashboard() {
                         alert('Profile updated successfully');
                       }
                     }}
-                    className="w-full bg-neon-cyan text-dark-bg font-black py-3 rounded-xl uppercase tracking-widest text-xs"
+                    className="w-full bg-neon-blue text-white font-black py-3 rounded-xl uppercase tracking-widest text-xs shadow-[0_0_15px_rgba(0,102,255,0.3)] hover:bg-white hover:text-dark-bg transition-all"
                   >
                     Save Changes
                   </button>
                 </div>
 
                 <div className="flex justify-between items-center p-4 glass-morphism bg-white/5 rounded-2xl">
-                  <span className="font-bold">{t('language')}</span>
+                  <span className="font-bold text-white">{t('language')}</span>
                   <button 
                     onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}
-                    className="text-neon-cyan font-black uppercase tracking-widest text-xs"
+                    className="text-neon-blue font-black uppercase tracking-widest text-xs"
                   >
                     {i18n.language === 'en' ? 'العربية' : 'English'}
                   </button>
@@ -724,7 +739,7 @@ export default function UserDashboard() {
                 {deferredPrompt && (
                   <button 
                     onClick={handleInstall}
-                    className="w-full flex justify-between items-center p-4 glass-morphism bg-neon-cyan/10 border-neon-cyan/20 rounded-2xl text-neon-cyan font-bold"
+                    className="w-full flex justify-between items-center p-4 glass-morphism bg-neon-blue/10 border-neon-blue/20 rounded-2xl text-neon-blue font-bold hover:bg-neon-blue/20 transition-all"
                   >
                     <span>Download App</span>
                     <Settings className="w-5 h-5" />
@@ -733,7 +748,7 @@ export default function UserDashboard() {
 
                 <button 
                   onClick={() => setUser(null)}
-                  className="w-full flex justify-between items-center p-4 glass-morphism bg-red-400/10 border-red-400/20 rounded-2xl text-red-400 font-bold"
+                  className="w-full flex justify-between items-center p-4 glass-morphism bg-red-400/10 border-red-400/20 rounded-2xl text-red-500 font-bold hover:bg-red-400/20 transition-all"
                 >
                   <span>{t('logout')}</span>
                   <LogOut className="w-5 h-5" />

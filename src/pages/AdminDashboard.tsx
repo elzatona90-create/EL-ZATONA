@@ -25,6 +25,7 @@ import {
   BarChart3,
   Calculator,
   Star,
+  Download,
   Search as SearchIcon,
   TrendingUp,
   History,
@@ -263,8 +264,20 @@ export default function AdminDashboard() {
     setIsAddingUser(false);
   };
 
+  const handleSetSelectedSection = (sectionId: string | null) => {
+    if (sectionId !== selectedSection) {
+      window.history.pushState({ tab: activeTab, sub: sectionId }, '', '');
+      setSelectedSection(sectionId);
+    }
+  };
+
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout 
+      activeTab={activeTab} 
+      setActiveTab={setActiveTab}
+      selectedSubState={selectedSection}
+      setSelectedSubState={setSelectedSection}
+    >
       <AnimatePresence mode="wait">
         {activeTab === 'home' && (
           <motion.div 
@@ -275,33 +288,33 @@ export default function AdminDashboard() {
           >
             <div className="flex justify-between items-end">
               <div className="space-y-1">
-                <h2 className="text-4xl font-black neon-text-cyan uppercase tracking-tight">
+                <h2 className="text-4xl font-black neon-text-blue uppercase tracking-tight">
                   {t('analytics')}
                 </h2>
                 <p className="text-gray-400 font-medium tracking-tight">
                   {t('welcome')}, {user?.username}
                 </p>
               </div>
-              <div className="w-16 h-16 rounded-2xl glass-morphism border-neon-magenta/30 flex items-center justify-center">
-                <TrendingUp className="w-8 h-8 text-neon-magenta" />
+              <div className="w-16 h-16 rounded-2xl glass-morphism border-neon-pink/30 flex items-center justify-center">
+                <TrendingUp className="w-8 h-8 text-neon-pink" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-cyan">
-                <p className="text-[10px] font-black text-neon-cyan tracking-widest uppercase mb-1">TOTAL SECTIONS</p>
+              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-blue">
+                <p className="text-[10px] font-black text-neon-blue tracking-widest uppercase mb-1">TOTAL SECTIONS</p>
                 <h4 className="text-3xl font-black">{sections.length}</h4>
               </div>
-              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-magenta">
-                <p className="text-[10px] font-black text-neon-magenta tracking-widest uppercase mb-1">TOTAL USERS</p>
-                <h4 className="text-3xl font-black">{users.length}</h4>
+              <div className="glass-morphism p-6 rounded-[24px] border-l-4 border-neon-pink shadow-[0_0_20px_rgba(255,0,127,0.1)]">
+                <p className="text-[10px] font-black text-neon-pink tracking-widest uppercase mb-1">TOTAL USERS</p>
+                <h4 className="text-3xl font-black neon-text-pink">{users.length}</h4>
               </div>
             </div>
 
             {/* Top 5 Searches Chart */}
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h3 className="text-xl font-black flex items-center gap-3">
-                <BarChart3 className="w-6 h-6 text-neon-cyan" />
+                <BarChart3 className="w-6 h-6 text-neon-blue" />
                 {t('top_searches')}
               </h3>
               <div className="h-[300px] w-full">
@@ -312,11 +325,11 @@ export default function AdminDashboard() {
                     <YAxis stroke="#666" fontSize={10} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#000a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                      itemStyle={{ color: '#00f2ff' }}
+                      itemStyle={{ color: '#0066ff' }}
                     />
-                    <Bar dataKey="count" fill="#00f2ff" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="count" fill="#0066ff" radius={[4, 4, 0, 0]}>
                       {searchLogs.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#00f2ff' : '#ff00ff'} />
+                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#0066ff' : '#ff007f'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -327,7 +340,7 @@ export default function AdminDashboard() {
             {/* User Activity List */}
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h3 className="text-xl font-black flex items-center gap-3">
-                <History className="w-6 h-6 text-neon-magenta" />
+                <History className="w-6 h-6 text-neon-pink" />
                 {t('user_activity')}
               </h3>
               <div className="space-y-4">
@@ -340,7 +353,7 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-neon-cyan">{log.count} {t('search_count')}</p>
+                      <p className="text-xs font-bold text-neon-blue">{log.count} {t('search_count')}</p>
                       <p className="text-[8px] text-gray-600 uppercase">
                         {new Date(log.last_searched_at).toLocaleDateString()}
                       </p>
@@ -360,7 +373,7 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="space-y-1">
-              <h2 className="text-4xl font-black neon-text-cyan uppercase tracking-tight">
+              <h2 className="text-4xl font-black neon-text-blue uppercase tracking-tight">
                 {t('global_search')}
               </h2>
               <p className="text-gray-400 font-medium tracking-tight">
@@ -375,7 +388,7 @@ export default function AdminDashboard() {
                 value={globalSearchQuery}
                 onChange={(e) => handleGlobalSearch(e.target.value)}
                 placeholder="Search everything..."
-                className="w-full bg-white/5 border-2 border-white/10 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-neon-cyan transition-all text-lg"
+                className="w-full bg-white/5 border-2 border-white/10 rounded-[28px] pl-16 pr-6 py-5 focus:outline-none focus:border-neon-blue transition-all text-lg"
               />
             </div>
 
@@ -385,13 +398,13 @@ export default function AdminDashboard() {
                   key={item.id} 
                   className="item-card-vertical cursor-pointer group"
                   onClick={() => {
-                    setSelectedSection(item.section_id);
+                    handleSetSelectedSection(item.section_id);
                     setActiveTab('sections');
                   }}
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase">
+                      <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">
                         {item.section?.emoji} {item.section?.title || item.section?.name}
                       </p>
                       <h4 className="text-xl font-black text-white">{item.title}</h4>
@@ -402,7 +415,7 @@ export default function AdminDashboard() {
                           e.stopPropagation();
                           toggleFavorite(item.id);
                         }}
-                        className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
+                        className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-pink' : 'text-gray-500 hover:text-white'}`}
                       >
                         <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
                       </button>
@@ -420,14 +433,14 @@ export default function AdminDashboard() {
                           });
                           setActiveTab('sections');
                         }}
-                        className="p-2 text-neon-cyan hover:bg-neon-cyan/10 rounded-xl"
+                        className="p-2 text-neon-blue hover:bg-neon-blue/10 rounded-xl"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase">DESCRIPTION</p>
+                    <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase">DESCRIPTION</p>
                     <div className="space-y-1">
                       {item.description?.split('\n').map((line: string, i: number) => (
                         <p key={i} className="description-text">
@@ -437,7 +450,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   {item.attachment_url && (
-                    <div className="flex items-center gap-2 text-neon-cyan text-[10px] font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-neon-blue text-[10px] font-black uppercase tracking-widest">
                       <Paperclip className="w-4 h-4" />
                       Has Attachment
                     </div>
@@ -464,17 +477,17 @@ export default function AdminDashboard() {
               <>
                 <div className="flex justify-between items-center mb-8">
                   <div className="flex items-center gap-4">
-                    <h3 className="text-3xl font-black neon-text-magenta">{t('sections')}</h3>
+                    <h3 className="text-3xl font-black neon-text-pink">{t('sections')}</h3>
                     <button 
                       onClick={() => seedSections()}
-                      className="text-[10px] font-black px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-gray-500 hover:text-neon-cyan transition-all uppercase tracking-widest"
+                      className="text-[10px] font-black px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-gray-500 hover:text-neon-blue transition-all uppercase tracking-widest"
                     >
                       Seed Defaults
                     </button>
                   </div>
                   <button 
                     onClick={() => setIsAddingSection(true)}
-                    className="p-3 bg-neon-cyan/20 rounded-xl text-neon-cyan hover:bg-neon-cyan/30 transition-all"
+                    className="p-3 bg-neon-blue/20 rounded-xl text-neon-blue hover:bg-neon-blue/30 transition-all"
                   >
                     <Plus className="w-6 h-6" />
                   </button>
@@ -487,24 +500,24 @@ export default function AdminDashboard() {
                       value={newSection.name}
                       onChange={(e) => setNewSection({...newSection, name: e.target.value})}
                       placeholder="Section Name"
-                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                     />
                     <input 
                       type="text"
                       value={newSection.emoji}
                       onChange={(e) => setNewSection({...newSection, emoji: e.target.value})}
                       placeholder="Emoji"
-                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                     />
                     <input 
                       type="text"
                       value={newSection.slug}
                       onChange={(e) => setNewSection({...newSection, slug: e.target.value})}
                       placeholder="Slug (e.g. contracts)"
-                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                      className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                     />
                     <div className="flex gap-2">
-                      <button onClick={handleAddSection} className="flex-1 bg-neon-cyan text-dark-bg font-bold py-3 rounded-xl">Add</button>
+                       <button onClick={handleAddSection} className="flex-1 bg-neon-blue text-dark-bg font-bold py-3 rounded-xl">Add</button>
                       <button onClick={() => setIsAddingSection(false)} className="flex-1 bg-white/10 font-bold py-3 rounded-xl">Cancel</button>
                     </div>
                   </div>
@@ -520,14 +533,14 @@ export default function AdminDashboard() {
                             value={newSection.name}
                             onChange={(e) => setNewSection({...newSection, name: e.target.value})}
                             placeholder="Section Name"
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                           />
                           <input 
                             type="text"
                             value={newSection.emoji}
                             onChange={(e) => setNewSection({...newSection, emoji: e.target.value})}
                             placeholder="Emoji"
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                           />
                           <div className="flex gap-2">
                             <button 
@@ -536,7 +549,7 @@ export default function AdminDashboard() {
                                 setEditingSection(null);
                                 setNewSection({ name: '', emoji: '', slug: '' });
                               }} 
-                              className="flex-1 bg-neon-cyan text-dark-bg font-bold py-3 rounded-xl"
+                              className="flex-1 bg-neon-blue text-dark-bg font-bold py-3 rounded-xl"
                             >
                               Update
                             </button>
@@ -546,14 +559,14 @@ export default function AdminDashboard() {
                       ) : (
                         <div className="flex gap-2">
                           <button 
-                            onClick={() => setSelectedSection(section.id)}
-                            className="flex-1 glass-morphism p-6 rounded-[24px] flex justify-between items-center hover:border-neon-cyan/50 transition-all"
+                            onClick={() => handleSetSelectedSection(section.id)}
+                            className="flex-1 glass-morphism p-6 rounded-[24px] flex justify-between items-center hover:border-neon-blue/50 transition-all"
                           >
                             <div className="flex items-center gap-4">
                               <span className="text-2xl">{section.emoji}</span>
                               <span className="text-xl font-black tracking-tight">{section.title || section.name}</span>
                             </div>
-                            <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-neon-cyan" />
+                            <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-neon-blue" />
                           </button>
                           <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all">
                             <button 
@@ -561,7 +574,7 @@ export default function AdminDashboard() {
                                 setEditingSection(section.id);
                                 setNewSection({ name: section.name, emoji: section.emoji, slug: section.slug });
                               }}
-                              className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-neon-cyan"
+                              className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-neon-blue"
                             >
                               <Edit className="w-5 h-5" />
                             </button>
@@ -583,10 +596,10 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-center">
                   <button 
                     onClick={() => {
-                      setSelectedSection(null);
+                      window.history.back();
                       setSectionSearchQuery('');
                     }}
-                    className="flex items-center gap-2 text-neon-cyan font-bold uppercase tracking-widest text-xs"
+                    className="flex items-center gap-2 text-neon-blue font-bold uppercase tracking-widest text-xs"
                   >
                     <ArrowLeft className="w-4 h-4" /> {t('back_to_sections')}
                   </button>
@@ -598,19 +611,19 @@ export default function AdminDashboard() {
                         value={sectionSearchQuery}
                         onChange={(e) => setSectionSearchQuery(e.target.value)}
                         placeholder="Search in section..."
-                        className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:border-neon-cyan outline-none transition-all"
+                        className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:border-neon-blue outline-none transition-all"
                       />
                     </div>
                     <button 
                       onClick={() => setIsAddingItem(true)}
-                      className="p-3 bg-neon-magenta/20 rounded-xl text-neon-magenta hover:bg-neon-magenta/30 transition-all"
+                      className="p-3 bg-neon-pink/20 rounded-xl text-neon-pink hover:bg-neon-pink/30 transition-all"
                     >
                       <Plus className="w-6 h-6" />
                     </button>
                   </div>
                 </div>
 
-                <h3 className="text-3xl font-black neon-text-cyan flex items-center gap-4">
+                <h3 className="text-3xl font-black neon-text-blue flex items-center gap-4">
                   <span>{sections.find(s => s.id === selectedSection)?.emoji}</span>
                   {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
                 </h3>
@@ -620,7 +633,7 @@ export default function AdminDashboard() {
                   <div className="space-y-8">
                     <div className="glass-morphism p-8 rounded-[32px] space-y-6">
                       <h4 className="text-xl font-black flex items-center gap-3">
-                        <Calculator className="w-6 h-6 text-neon-cyan" />
+                        <Calculator className="w-6 h-6 text-neon-blue" />
                         {t('calculate')}
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -629,8 +642,8 @@ export default function AdminDashboard() {
                           <select 
                             value={calcAnalysis}
                             onChange={(e) => setCalcAnalysis(e.target.value)}
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                           >
                             <option value="" className="bg-dark-bg">{t('select_analysis')}</option>
                             {[...new Set(prices.map(p => p.analysis_name))].map(name => (
@@ -643,8 +656,8 @@ export default function AdminDashboard() {
                           <select 
                             value={calcCompany}
                             onChange={(e) => setCalcCompany(e.target.value)}
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                           >
                             <option value="" className="bg-dark-bg">{t('select_company')}</option>
                             {[...new Set(prices.map(p => p.company_name))].map(name => (
@@ -657,8 +670,8 @@ export default function AdminDashboard() {
                           <select 
                             value={calcContract}
                             onChange={(e) => setCalcContract(e.target.value)}
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                           >
                             <option value="" className="bg-dark-bg">{t('select_contract')}</option>
                             {[...new Set(prices.map(p => p.contract_type))].map(type => (
@@ -670,7 +683,7 @@ export default function AdminDashboard() {
                       <div className="flex gap-2">
                         <button 
                           onClick={handleAddTest}
-                          className="flex-1 bg-neon-cyan text-dark-bg font-black py-4 rounded-xl uppercase tracking-widest"
+                          className="flex-1 bg-neon-blue text-dark-bg font-black py-4 rounded-xl uppercase tracking-widest"
                         >
                           Add
                         </button>
@@ -691,7 +704,7 @@ export default function AdminDashboard() {
                         <div className="space-y-4 pt-4 border-t border-white/10">
                           <div className="flex justify-between items-center">
                             <span className="text-gray-400 font-bold">{t('total')}</span>
-                            <span className="text-2xl font-black text-neon-cyan">
+                            <span className="text-2xl font-black text-neon-blue">
                               {invoiceItems.reduce((acc, curr) => acc + parseFloat(curr.price), 0).toFixed(2)}
                             </span>
                           </div>
@@ -703,7 +716,7 @@ export default function AdminDashboard() {
                                   <p className="text-[10px] text-gray-400">{res.company_name} - {res.contract_type}</p>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                  <span className="font-black text-neon-magenta">{res.price}</span>
+                                  <span className="font-black text-neon-pink">{res.price}</span>
                                   <button 
                                     onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== idx))}
                                     className="text-gray-500 hover:text-red-400 transition-colors"
@@ -722,7 +735,7 @@ export default function AdminDashboard() {
                       <h4 className="text-xl font-black">{t('prices')} Database</h4>
                       <button 
                         onClick={() => setIsAddingPrice(true)}
-                        className="p-2 bg-neon-magenta/20 text-neon-magenta rounded-lg"
+                        className="p-2 bg-neon-pink/20 text-neon-pink rounded-lg"
                       >
                         <Plus className="w-5 h-5" />
                       </button>
@@ -777,7 +790,7 @@ export default function AdminDashboard() {
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2"
                         />
                         <div className="flex gap-2">
-                          <button onClick={handleAddPrice} className="flex-1 bg-neon-cyan text-dark-bg font-bold py-2 rounded-xl">Save</button>
+                          <button onClick={handleAddPrice} className="flex-1 bg-neon-blue text-dark-bg font-bold py-2 rounded-xl">Save</button>
                           <button onClick={() => setIsAddingPrice(false)} className="flex-1 bg-white/10 py-2 rounded-xl">Cancel</button>
                         </div>
                       </div>
@@ -807,7 +820,7 @@ export default function AdminDashboard() {
                                     setEditingItem(null);
                                     setNewPrice({ analysis_name: '', company_name: '', contract_type: '', price: '' });
                                   }}
-                                  className="p-1 text-neon-cyan"
+                                  className="p-1 text-neon-blue"
                                 >
                                   <Save className="w-5 h-5" />
                                 </button>
@@ -819,7 +832,7 @@ export default function AdminDashboard() {
                           ) : (
                             <>
                               <div>
-                                <p className="font-black text-neon-cyan">{p.analysis_name}</p>
+                                <p className="font-black text-neon-blue">{p.analysis_name}</p>
                                 <p className="text-[10px] text-gray-500 uppercase tracking-widest">{p.company_name} | {p.contract_type}</p>
                               </div>
                               <div className="flex items-center gap-4">
@@ -835,7 +848,7 @@ export default function AdminDashboard() {
                                         price: p.price.toString()
                                       });
                                     }}
-                                    className="text-neon-cyan"
+                                    className="text-neon-blue"
                                   >
                                     <Edit className="w-5 h-5" />
                                   </button>
@@ -857,12 +870,12 @@ export default function AdminDashboard() {
                   <>
                     {(isAddingItem || editingItem) && (
                       <div className="glass-morphism p-8 rounded-[32px] space-y-4">
-                        <input 
+                         <input 
                           type="text"
                           value={newItem.title}
                           onChange={(e) => setNewItem({...newItem, title: e.target.value})}
                           placeholder="Item Title"
-                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                         />
                         
                         {/* Special Logic for Application Section */}
@@ -870,8 +883,8 @@ export default function AdminDashboard() {
                           <select 
                             value={newItem.category}
                             onChange={(e) => setNewItem({...newItem, category: e.target.value})}
-                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                            className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                           >
                             <option value="" className="bg-dark-bg">Select Type</option>
                             <option value="Email" className="bg-dark-bg">Email</option>
@@ -883,17 +896,17 @@ export default function AdminDashboard() {
                           value={newItem.description}
                           onChange={(e) => setNewItem({...newItem, description: e.target.value})}
                           placeholder="Description"
-                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all min-h-[100px]"
+                          className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all min-h-[100px]"
                         />
 
                         <div className="space-y-2">
                           <p className="text-[10px] font-black text-gray-500 tracking-widest uppercase">Attachment (Image or PDF)</p>
                           <div className="flex gap-2">
-                            <label className="flex-1 bg-white/5 border-2 border-white/10 rounded-xl px-4 py-2 hover:border-neon-cyan transition-all cursor-pointer flex items-center justify-between">
+                            <label className="flex-1 bg-white/5 border-2 border-white/10 rounded-xl px-4 py-2 hover:border-neon-blue transition-all cursor-pointer flex items-center justify-between">
                               <span className="text-gray-400 truncate">
                                 {isUploading ? 'Uploading...' : (newItem.attachment_url ? 'File Selected' : 'Choose File...')}
                               </span>
-                              <Upload className={`w-5 h-5 text-neon-cyan ${isUploading ? 'animate-bounce' : ''}`} />
+                              <Upload className={`w-5 h-5 text-neon-blue ${isUploading ? 'animate-bounce' : ''}`} />
                               <input 
                                 type="file" 
                                 className="hidden" 
@@ -904,8 +917,8 @@ export default function AdminDashboard() {
                             </label>
                             <select 
                               onChange={(e) => setNewItem({...newItem, attachment_url: e.target.value})}
-                              className="bg-white/5 border-2 border-white/10 rounded-xl px-2 py-2 text-xs focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white pr-8"
-                              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.2em' }}
+                              className="bg-white/5 border-2 border-white/10 rounded-xl px-2 py-2 text-xs focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white pr-8"
+                              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.2em' }}
                             >
                               <option value="" className="bg-dark-bg">Select from files</option>
                               {attachments.map(f => (
@@ -916,7 +929,7 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="flex gap-2">
-                          <button onClick={handleAddItem} className="flex-1 bg-neon-magenta text-white font-bold py-3 rounded-xl">
+                          <button onClick={handleAddItem} className="flex-1 bg-neon-pink text-white font-bold py-3 rounded-xl">
                             {editingItem ? 'Update Item' : 'Add Item'}
                           </button>
                           <button onClick={() => { setIsAddingItem(false); setEditingItem(null); }} className="flex-1 bg-white/10 font-bold py-3 rounded-xl">Cancel</button>
@@ -936,7 +949,7 @@ export default function AdminDashboard() {
                           <div className="absolute right-6 top-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10">
                             <button 
                               onClick={() => toggleFavorite(item.id)}
-                              className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-magenta' : 'text-gray-500 hover:text-white'}`}
+                              className={`p-2 rounded-xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-pink' : 'text-gray-500 hover:text-white'}`}
                             >
                               <Star className={`w-5 h-5 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
                             </button>
@@ -951,7 +964,7 @@ export default function AdminDashboard() {
                                   attachment_url: item.attachment_url || ''
                                 });
                               }}
-                              className="p-2 text-neon-cyan hover:bg-neon-cyan/10 rounded-xl transition-all"
+                              className="p-2 text-neon-blue hover:bg-neon-blue/10 rounded-xl transition-all"
                             >
                               <Edit className="w-5 h-5" />
                             </button>
@@ -966,27 +979,27 @@ export default function AdminDashboard() {
                           <div className="space-y-4">
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-1">NAME</p>
-                                <div className="inline-block bg-neon-cyan/10 px-4 py-1.5 rounded-lg border border-neon-cyan/20">
-                                  <h4 className="text-lg font-bold text-neon-cyan">{item.title}</h4>
+                                <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase mb-1">NAME</p>
+                                <div className="inline-block bg-neon-blue/10 px-4 py-1.5 rounded-lg border border-neon-blue/20">
+                                  <h4 className="text-lg font-bold text-neon-blue">{item.title}</h4>
                                 </div>
                               </div>
                             </div>
 
                             <div>
-                              <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
+                              <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
                               <div className="space-y-1">
                                 {item.description?.split('\n').map((line: string, i: number) => (
                                   <p key={i} className="description-text">
                                     {line}
                                   </p>
-                                ))}
+                                )) || null /* Ensure null safety */}
                               </div>
                             </div>
 
                             {item.category && (
                               <div className="pt-2">
-                                <span className="inline-block bg-[#001233] text-neon-cyan text-xs font-bold px-3 py-1 rounded-md border border-neon-cyan/20">
+                                <span className="inline-block bg-[#001233] text-neon-blue text-xs font-bold px-3 py-1 rounded-md border border-neon-blue/20">
                                   {item.category}
                                 </span>
                               </div>
@@ -994,12 +1007,12 @@ export default function AdminDashboard() {
 
                             {item.attachment_url && (
                               <div className="pt-2">
-                                <p className="text-[10px] font-black text-neon-cyan tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
+                                <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
                                 <a 
                                   href={item.attachment_url} 
                                   target="_blank" 
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-2 bg-neon-cyan/10 text-neon-cyan font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-cyan/20 transition-all"
+                                  className="inline-flex items-center gap-2 bg-neon-blue/10 text-neon-blue font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-blue/20 transition-all"
                                 >
                                   <Paperclip className="w-4 h-4" />
                                   {t('view_attachment')}
@@ -1025,7 +1038,7 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="space-y-1">
-              <h2 className="text-4xl font-black neon-text-magenta uppercase tracking-tight">
+              <h2 className="text-4xl font-black neon-text-pink uppercase tracking-tight">
                 {t('favorites')}
               </h2>
               <p className="text-gray-400 font-medium tracking-tight">
@@ -1035,21 +1048,21 @@ export default function AdminDashboard() {
 
             <div className="space-y-6">
               {items.filter(i => favorites.some(f => f.item_id === i.id && f.user_id === user?.id)).map((item) => (
-                <div key={item.id} className="glass-morphism-magenta rounded-2xl p-6 relative overflow-hidden">
+                <div key={item.id} className="glass-morphism rounded-2xl p-6 relative overflow-hidden">
                   <div className="space-y-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-1">
+                        <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase mb-1">
                           {sections.find(s => s.id === item.section_id)?.name}
                         </p>
-                        <div className="inline-block bg-neon-magenta/10 px-4 py-1.5 rounded-lg border border-neon-magenta/20">
-                          <h4 className="text-lg font-bold text-neon-magenta">{item.title}</h4>
+                        <div className="inline-block bg-neon-pink/10 px-4 py-1.5 rounded-lg border border-neon-pink/20">
+                          <h4 className="text-lg font-bold text-neon-pink">{item.title}</h4>
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => {
-                            setSelectedSection(item.section_id);
+                            handleSetSelectedSection(item.section_id);
                             setEditingItem(item.id);
                             setNewItem({
                               title: item.title,
@@ -1060,13 +1073,13 @@ export default function AdminDashboard() {
                             });
                             setActiveTab('sections');
                           }}
-                          className="p-2 bg-neon-cyan/10 rounded-xl text-neon-cyan hover:bg-neon-cyan/20 transition-all"
+                          className="p-2 bg-neon-blue/10 rounded-xl text-neon-blue hover:bg-neon-blue/20 transition-all"
                         >
                           <Edit className="w-5 h-5" />
                         </button>
                         <button 
                           onClick={() => toggleFavorite(item.id)}
-                          className="p-2 rounded-xl transition-all text-neon-magenta hover:bg-white/5"
+                          className="p-2 rounded-xl transition-all text-neon-pink hover:bg-white/5"
                         >
                           <Star className="w-5 h-5 fill-current" />
                         </button>
@@ -1074,7 +1087,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
+                      <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase mb-1">DESCRIPTION</p>
                       <div className="space-y-1">
                         {item.description?.split('\n').map((line: string, i: number) => (
                           <p key={i} className="text-sm font-medium leading-relaxed text-gray-200">
@@ -1086,12 +1099,12 @@ export default function AdminDashboard() {
 
                     {item.attachment_url && (
                       <div className="pt-2">
-                        <p className="text-[10px] font-black text-neon-magenta tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
+                        <p className="text-[10px] font-black text-neon-pink tracking-[0.2em] uppercase mb-2">ATTACHMENT</p>
                         <a 
                           href={item.attachment_url} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="inline-flex items-center gap-2 bg-neon-magenta/10 text-neon-magenta font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-magenta/20 transition-all"
+                          className="inline-flex items-center gap-2 bg-neon-pink/10 text-neon-pink font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full hover:bg-neon-pink/20 transition-all"
                         >
                           <Paperclip className="w-4 h-4" />
                           {t('view_attachment')}
@@ -1119,8 +1132,8 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-cyan">{t('attachments')}</h3>
-              <label className="cursor-pointer p-3 bg-neon-magenta/20 rounded-xl text-neon-magenta hover:bg-neon-magenta/30 transition-all">
+              <h3 className="text-3xl font-black neon-text-blue">{t('attachments')}</h3>
+              <label className="cursor-pointer p-3 bg-neon-pink/20 rounded-xl text-neon-pink hover:bg-neon-pink/30 transition-all">
                 <Upload className={`w-6 h-6 ${isUploading ? 'animate-bounce' : ''}`} />
                 <input 
                   type="file" 
@@ -1139,7 +1152,7 @@ export default function AdminDashboard() {
                 value={attachmentSearch}
                 onChange={(e) => setAttachmentSearch(e.target.value)}
                 placeholder="Search attachments..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
               />
             </div>
 
@@ -1149,8 +1162,8 @@ export default function AdminDashboard() {
                 .map((file) => (
                 <div key={file.id} className="glass-morphism p-8 rounded-[32px] flex justify-between items-center group">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center border border-white/10">
-                      <FileText className="w-8 h-8 text-neon-magenta" />
+                    <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center border border-white/10 shadow-[0_0_15px_rgba(0,102,255,0.1)]">
+                      <FileText className="w-8 h-8 text-neon-pink" />
                     </div>
                     <div>
                       <h4 className="text-xl font-black truncate max-w-[200px]">{file.name}</h4>
@@ -1159,7 +1172,7 @@ export default function AdminDashboard() {
                           {(file.size / 1024).toFixed(1)} KB | {new Date(file.created_at).toLocaleDateString()}
                         </p>
                         {file.section_id && (
-                          <span className="text-[8px] font-black text-neon-cyan tracking-widest uppercase bg-neon-cyan/10 px-2 py-0.5 rounded">
+                          <span className="text-[8px] font-black text-neon-blue tracking-widest uppercase bg-neon-blue/10 px-2 py-0.5 rounded border border-neon-blue/20">
                             {sections.find(s => s.id === file.section_id)?.emoji} {sections.find(s => s.id === file.section_id)?.title || sections.find(s => s.id === file.section_id)?.name}
                           </span>
                         )}
@@ -1171,7 +1184,7 @@ export default function AdminDashboard() {
                       href={file.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-3 bg-white/5 rounded-xl text-neon-cyan hover:bg-neon-cyan/10"
+                      className="p-3 bg-white/5 rounded-xl text-neon-blue hover:bg-neon-blue/10 transition-all"
                     >
                       <Paperclip className="w-6 h-6" />
                     </a>
@@ -1196,10 +1209,10 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-magenta">{t('users')}</h3>
+              <h3 className="text-3xl font-black neon-text-pink">{t('users')}</h3>
               <button 
                 onClick={() => setIsAddingUser(true)}
-                className="p-3 bg-neon-cyan/20 rounded-xl text-neon-cyan hover:bg-neon-cyan/30 transition-all"
+                className="p-3 bg-neon-blue/20 rounded-xl text-neon-blue hover:bg-neon-blue/30 transition-all border border-neon-blue/30"
               >
                 <Plus className="w-6 h-6" />
               </button>
@@ -1212,23 +1225,23 @@ export default function AdminDashboard() {
                   value={newUser.username}
                   onChange={(e) => setNewUser({...newUser, username: e.target.value})}
                   placeholder="Username"
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                 />
                 <input 
                   type="password"
                   value={newUser.password}
                   onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                   placeholder="Password"
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-cyan transition-all"
+                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-neon-blue transition-all"
                 />
                 <select 
                   value={newUser.role}
                   onChange={(e) => setNewUser({...newUser, role: e.target.value as any})}
-                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all appearance-none cursor-pointer font-bold text-white"
-                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2300f2ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
+                  className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all appearance-none cursor-pointer font-bold text-white pr-10"
+                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%230066ff\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em' }}
                 >
-                  <option value="user" className="bg-dark-bg">User</option>
-                  <option value="admin" className="bg-dark-bg">Admin</option>
+                  <option value="user" className="bg-dark-bg font-sans">User</option>
+                  <option value="admin" className="bg-dark-bg font-sans">Admin</option>
                 </select>
                 <div className="flex gap-2">
                   <button 
@@ -1239,7 +1252,7 @@ export default function AdminDashboard() {
                       setNewUser({ username: '', password: '', role: 'user' });
                       await fetchData(true);
                     }} 
-                    className="flex-1 bg-neon-cyan text-dark-bg font-bold py-3 rounded-xl"
+                    className="flex-1 bg-neon-blue text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(0,102,255,0.4)]"
                   >
                     Add User
                   </button>
@@ -1250,10 +1263,10 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 gap-4">
               {users.map((u) => (
-                <div key={u.id} className="glass-morphism p-6 rounded-[24px] flex justify-between items-center group">
+                <div key={u.id} className="glass-morphism p-6 rounded-[24px] flex justify-between items-center group hover:border-neon-blue transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                      <UserIcon className={`w-6 h-6 ${u.role === 'admin' ? 'text-neon-magenta' : 'text-neon-cyan'}`} />
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-neon-blue/30 transition-all">
+                      <UserIcon className={`w-6 h-6 ${u.role === 'admin' ? 'text-neon-pink' : 'text-neon-blue'}`} />
                     </div>
                     <div>
                       <h4 className="text-xl font-black">{u.username}</h4>
@@ -1282,7 +1295,7 @@ export default function AdminDashboard() {
             className="space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-3xl font-black neon-text-magenta">{t('settings')}</h3>
+              <h3 className="text-3xl font-black neon-text-pink">{t('settings')}</h3>
               <button 
                 onClick={logout}
                 className="p-3 bg-red-500/20 text-red-500 rounded-xl font-black uppercase tracking-widest text-xs flex items-center gap-2"
@@ -1293,7 +1306,7 @@ export default function AdminDashboard() {
 
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
-                <UserIcon className="w-6 h-6 text-neon-cyan" />
+                <UserIcon className="w-6 h-6 text-neon-blue" />
                 {t('profile')}
               </h4>
               <div className="space-y-4">
@@ -1302,13 +1315,13 @@ export default function AdminDashboard() {
                   defaultValue={user?.username}
                   id="admin-username"
                   placeholder="New Username"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all"
                 />
                 <input 
                   type="password"
                   id="admin-password"
                   placeholder="New Password"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-cyan outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-neon-blue outline-none transition-all"
                 />
                 <button 
                   onClick={async () => {
@@ -1317,7 +1330,7 @@ export default function AdminDashboard() {
                     await updateCurrentUser({ username, password });
                     alert('Profile updated successfully');
                   }}
-                  className="w-full bg-neon-cyan text-dark-bg font-black py-3 rounded-xl uppercase tracking-widest text-xs"
+                  className="w-full bg-neon-blue text-white font-black py-3 rounded-xl uppercase tracking-widest text-xs shadow-[0_0_15px_rgba(0,102,255,0.3)] hover:shadow-[0_0_25px_rgba(0,102,255,0.5)] transition-all"
                 >
                   Save Changes
                 </button>
@@ -1327,13 +1340,14 @@ export default function AdminDashboard() {
             {deferredPrompt && (
               <div className="glass-morphism p-8 rounded-[32px] space-y-6">
                 <h4 className="text-xl font-black flex items-center gap-3">
-                  <Settings className="w-6 h-6 text-neon-cyan" />
+                  <Settings className="w-6 h-6 text-neon-blue" />
                   Download App
                 </h4>
                 <button 
                   onClick={handleInstall}
-                  className="w-full bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 font-black py-4 rounded-xl uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+                  className="w-full bg-neon-blue/10 text-neon-blue border border-neon-blue/20 font-black py-4 rounded-xl uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-neon-blue/20 transition-all"
                 >
+                  <Download className="w-4 h-4" />
                   Install Application
                 </button>
               </div>
@@ -1341,7 +1355,7 @@ export default function AdminDashboard() {
 
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
-                <Users className="w-6 h-6 text-neon-cyan" />
+                <Users className="w-6 h-6 text-neon-blue" />
                 {t('user_management')}
               </h4>
               
@@ -1352,18 +1366,18 @@ export default function AdminDashboard() {
                     value={newUser.username}
                     onChange={(e) => setNewUser({...newUser, username: e.target.value})}
                     placeholder="Username"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 focus:border-neon-blue outline-none transition-all"
                   />
                   <input 
                     type="password"
                     value={newUser.password}
                     onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                     placeholder="Password"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 focus:border-neon-blue outline-none transition-all"
                   />
                   <button 
                     onClick={handleAddUser}
-                    className="p-2 bg-neon-cyan text-dark-bg rounded-xl"
+                    className="p-2 bg-neon-blue text-white rounded-xl shadow-[0_0_10px_rgba(0,102,255,0.3)]"
                   >
                     <Plus className="w-6 h-6" />
                   </button>
@@ -1371,20 +1385,20 @@ export default function AdminDashboard() {
 
                 <div className="space-y-2">
                   {users.map((u) => (
-                    <div key={u.id} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/10">
+                    <div key={u.id} className="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
                       {editingUser === u.id ? (
                         <div className="flex-1 flex gap-2">
                           <input 
                             type="text"
                             value={newUser.username}
                             onChange={(e) => setNewUser({...newUser, username: e.target.value})}
-                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1"
+                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1 focus:border-neon-blue outline-none"
                           />
                           <input 
                             type="password"
                             value={newUser.password}
                             onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1"
+                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1 focus:border-neon-blue outline-none"
                           />
                           <button 
                             onClick={async () => {
@@ -1392,7 +1406,7 @@ export default function AdminDashboard() {
                               setEditingUser(null);
                               setNewUser({ username: '', password: '', role: 'user' });
                             }}
-                            className="p-1 text-neon-cyan"
+                            className="p-1 text-neon-blue"
                           >
                             <Save className="w-5 h-5" />
                           </button>
@@ -1404,7 +1418,7 @@ export default function AdminDashboard() {
                         <>
                           <div>
                             <p className="font-bold">{u.username}</p>
-                            <p className="text-[10px] text-neon-magenta uppercase font-black tracking-widest">{u.role}</p>
+                            <p className="text-[10px] text-neon-pink uppercase font-black tracking-widest">{u.role}</p>
                           </div>
                           <div className="flex gap-2">
                             <button 
@@ -1412,13 +1426,13 @@ export default function AdminDashboard() {
                                 setEditingUser(u.id);
                                 setNewUser({ username: u.username, password: '', role: u.role });
                               }}
-                              className="p-2 text-neon-cyan hover:bg-neon-cyan/10 rounded-lg"
+                              className="p-2 text-neon-blue hover:bg-neon-blue/10 rounded-lg transition-all"
                             >
                               <Edit className="w-5 h-5" />
                             </button>
                             <button 
                               onClick={() => deleteUser(u.id)}
-                              className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg"
+                              className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
@@ -1433,52 +1447,20 @@ export default function AdminDashboard() {
 
             <div className="glass-morphism p-8 rounded-[32px] space-y-6">
               <h4 className="text-xl font-black flex items-center gap-3">
-                <Database className="w-6 h-6 text-neon-cyan" />
-                Data Migration
-              </h4>
-              <p className="text-gray-400 text-sm font-medium">
-                Migrate legacy data from Firebase to Supabase. This is a one-time operation.
-              </p>
-              <button 
-                onClick={() => window.location.href = '/migrate'}
-                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
-              >
-                <Database className="w-4 h-4" /> Go to Migration Page
-              </button>
-            </div>
-
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Palette className="w-6 h-6 text-neon-magenta" />
+                <Palette className="w-6 h-6 text-neon-pink" />
                 {t('theme')}
               </h4>
               <div className="grid grid-cols-3 gap-4">
-                {['teal', 'pink', 'blue'].map((t) => (
+                {['teal', 'pink', 'blue'].map((themeName) => (
                   <button 
-                    key={t}
-                    onClick={() => setTheme(t as any)}
-                    className={`p-4 rounded-2xl border-2 transition-all capitalize font-bold ${theme === t ? 'border-neon-cyan bg-neon-cyan/10' : 'border-white/10 bg-white/5'}`}
+                    key={themeName}
+                    onClick={() => setTheme(themeName as any)}
+                    className={`p-4 rounded-2xl border-2 transition-all capitalize font-bold ${theme === themeName ? 'border-neon-blue bg-neon-blue/10 text-white' : 'border-white/10 bg-white/5 text-gray-500'}`}
                   >
-                    {t}
+                    {themeName}
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="glass-morphism p-8 rounded-[32px] space-y-6">
-              <h4 className="text-xl font-black flex items-center gap-3">
-                <Database className="w-6 h-6 text-neon-cyan" />
-                Data Migration
-              </h4>
-              <p className="text-gray-400 text-sm font-medium">
-                Migrate data from the legacy Firebase database to the new Supabase database.
-              </p>
-              <button 
-                onClick={() => window.location.href = '/migrate'}
-                className="w-full bg-white/5 border border-neon-cyan/50 text-neon-cyan font-black py-4 rounded-xl uppercase tracking-widest text-xs hover:bg-neon-cyan/10 transition-all flex items-center justify-center gap-2"
-              >
-                <Database className="w-4 h-4" /> Go to Migration Page
-              </button>
             </div>
           </motion.div>
         )}

@@ -9,33 +9,48 @@ interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  selectedSubState?: string | null;
+  setSelectedSubState?: (state: string | null) => void;
 }
 
-export default function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
+export default function Layout({ 
+  children, 
+  activeTab, 
+  setActiveTab,
+  selectedSubState = null,
+  setSelectedSubState
+}: LayoutProps) {
   const { t } = useTranslation();
   const { user } = useStore();
 
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    // Initial state
+    // Initial state setup
     if (!window.history.state) {
-      window.history.replaceState({ tab: activeTab }, '', '');
+      window.history.replaceState({ tab: activeTab, sub: selectedSubState }, '', '');
     }
 
     const handlePopState = (event: PopStateEvent) => {
-      if (event.state && event.state.tab) {
-        setActiveTab(event.state.tab);
+      if (event.state) {
+        if (event.state.tab && event.state.tab !== activeTab) {
+          setActiveTab(event.state.tab);
+        }
+        if (setSelectedSubState) {
+          setSelectedSubState(event.state.sub || null);
+        }
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [setActiveTab, activeTab]);
+  }, [setActiveTab, activeTab, selectedSubState, setSelectedSubState]);
 
   const handleTabChange = (tabId: string) => {
     if (tabId !== activeTab) {
-      window.history.pushState({ tab: tabId }, '', '');
+      // Clear sub-state when switching main tabs
+      window.history.pushState({ tab: tabId, sub: null }, '', '');
       setActiveTab(tabId);
+      if (setSelectedSubState) setSelectedSubState(null);
     }
   };
 
@@ -50,10 +65,20 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
   ];
 
   return (
-    <div className="min-h-screen pb-32 relative">
+    <div className="min-h-screen pb-32 relative overflow-x-hidden">
+      {/* Dynamic Glass Neon Border */}
+      <div className="app-neon-border"></div>
+      
+      {/* Subtle Animated Background Shine */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-blue rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon-pink rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
       <header className="p-6 flex justify-between items-center max-w-4xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-neon-cyan p-0.5 bg-dark-bg neon-glow-cyan flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-transparent p-[2px] bg-gradient-to-br from-neon-blue to-neon-pink neon-glow-blue flex items-center justify-center relative">
+            <div className="absolute inset-0 bg-dark-bg rounded-[10px] -z-10"></div>
             {!imgError ? (
               <img 
                 src={BRANDING.logo_url} 
@@ -63,26 +88,16 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
                 onError={() => setImgError(true)}
               />
             ) : (
-              <Brain className="w-8 h-8 text-neon-cyan" />
+              <Brain className="w-8 h-8 text-neon-blue" />
             )}
           </div>
-          <h1 className="text-2xl font-black neon-text-cyan tracking-widest whitespace-nowrap">{t('app_name')}</h1>
+          <h1 className="text-2xl font-black neon-text-blue tracking-widest whitespace-nowrap">{t('app_name')}</h1>
         </div>
       </header>
 
       <main className="p-6 max-w-4xl mx-auto">
         {children}
       </main>
-
-      {/* Persistent Branding at Bottom */}
-      <div className="fixed bottom-24 left-0 right-0 text-center pointer-events-none z-40">
-        <p className="text-[10px] font-black neon-text-cyan tracking-[0.2em] uppercase opacity-50">
-          {t('footer_team')}
-        </p>
-        <p className="text-[8px] font-bold text-neon-magenta tracking-[0.1em] uppercase opacity-50">
-          {t('branding_content')}
-        </p>
-      </div>
 
       {/* Bottom Navigation */}
       <nav className="bottom-nav">

@@ -7,7 +7,7 @@ const resources = {
     translation: {
       app_name: 'EL ZATONA',
       branding_design: 'DESIGN BY : ISLAM AL SAPAA',
-      branding_content: 'CONTENT DEVELOPED BY : KIH',
+      branding_content: 'CONTENT DEVELOPED BY : IKH',
       footer_authorized: 'AUTHORIZED PERSONNEL ONLY',
       footer_team: 'RECEPTION TEAM',
       username: 'Username',
@@ -70,7 +70,7 @@ const resources = {
     translation: {
       app_name: 'الزتونة',
       branding_design: 'تصميم: إسلام السبع',
-      branding_content: 'تطوير المحتوى: KIH',
+      branding_content: 'تطوير المحتوى: IKH',
       footer_authorized: 'للموظفين المصرح لهم فقط',
       footer_team: 'فريق الاستقبال',
       username: 'اسم المستخدم',

@@ -12,7 +12,6 @@ import './lib/i18n';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
-import MigrationPage from './pages/MigrationPage';
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -42,23 +41,13 @@ export default function App() {
   if (!isReady) {
     return (
       <div className="flex items-center justify-center h-screen bg-dark-bg">
-        <div className="w-16 h-16 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin neon-glow-cyan"></div>
+        <div className="w-16 h-16 border-4 border-neon-blue border-t-transparent rounded-full animate-spin neon-glow-blue"></div>
       </div>
     );
   }
 
   if (!user) {
     return <Login />;
-  }
-
-  // Simple routing for migration page
-  if (window.location.pathname === '/migrate') {
-    if (user.role === 'admin') {
-      return <MigrationPage />;
-    } else {
-      window.location.href = '/';
-      return null;
-    }
   }
 
   return user.role === 'admin' ? <AdminDashboard /> : <UserDashboard />;
