@@ -2,10 +2,10 @@
   "name": "EL ZATONA",
   "short_name": "ELZATONA",
   "description": "El Zatona - Your Exclusive Knowledge Base",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "display": "standalone",
-  "background_color": "#0a0f24",
-  "theme_color": "#00f2ff",
+  "background_color": "#020617",
+  "theme_color": "#0066ff",
   "icons": [
     {
       "src": "/logo.png",

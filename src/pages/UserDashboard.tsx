@@ -150,6 +150,26 @@ export default function UserDashboard() {
               </p>
             </div>
 
+            {deferredPrompt && (
+              <motion.button 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={handleInstall}
+                className="w-full glass-morphism p-4 rounded-[24px] border-2 border-neon-pink/50 flex items-center justify-between group hover:bg-neon-pink/10 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
+                    <LogOut className="w-5 h-5 text-neon-pink rotate-180" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-black text-white leading-none">INSTALL APP</p>
+                    <p className="text-[8px] font-black text-neon-pink tracking-widest uppercase mt-1">Add to home screen</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-neon-pink group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            )}
+
             {/* AI Search Assistant Card */}
             <div className="glass-morphism rounded-[32px] border-2 border-neon-blue/50 relative overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,102,255,0.15)] mx-auto w-full max-w-md min-h-[500px]">
               <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md relative">
@@ -735,16 +755,6 @@ export default function UserDashboard() {
                     {i18n.language === 'en' ? 'العربية' : 'English'}
                   </button>
                 </div>
-
-                {deferredPrompt && (
-                  <button 
-                    onClick={handleInstall}
-                    className="w-full flex justify-between items-center p-4 glass-morphism bg-neon-blue/10 border-neon-blue/20 rounded-2xl text-neon-blue font-bold hover:bg-neon-blue/20 transition-all"
-                  >
-                    <span>Download App</span>
-                    <Settings className="w-5 h-5" />
-                  </button>
-                )}
 
                 <button 
                   onClick={() => setUser(null)}
