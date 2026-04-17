@@ -1,4 +1,4 @@
-const CACHE_NAME = 'el-zatona-v2';
+const CACHE_NAME = 'el-zatona-v3';
 const urlsToCache = [
   '/',
   '/manifest.json',

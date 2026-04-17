@@ -77,18 +77,18 @@ export default function Layout({
 
       <header className="p-6 flex justify-between items-center max-w-4xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-transparent p-[2px] bg-gradient-to-br from-neon-blue to-neon-pink neon-glow-blue flex items-center justify-center relative">
-            <div className="absolute inset-0 bg-dark-bg rounded-[10px] -z-10"></div>
+          <div className="w-12 h-12 rounded-xl border-2 border-transparent p-[2px] bg-gradient-to-br from-neon-blue to-neon-pink neon-glow-blue flex items-center justify-center relative">
+            <div className="absolute inset-0 bg-dark-bg rounded-[10px] z-0"></div>
             {!imgError ? (
               <img 
                 src={BRANDING.logo_url} 
                 alt="Logo" 
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover rounded-lg relative z-10"
                 referrerPolicy="no-referrer"
                 onError={() => setImgError(true)}
               />
             ) : (
-              <Brain className="w-8 h-8 text-neon-blue" />
+              <Brain className="w-8 h-8 text-neon-blue relative z-10" />
             )}
           </div>
           <h1 className="text-2xl font-black neon-text-blue tracking-widest whitespace-nowrap">{t('app_name')}</h1>
