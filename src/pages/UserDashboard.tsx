@@ -210,8 +210,16 @@ export default function UserDashboard() {
                                 <h4 className="text-sm font-black text-neon-blue">{item.title || item.name}</h4>
                               </div>
                             </div>
-                            <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
-                              {item.section?.title || item.section?.name}
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="px-2 py-0.5 rounded-full bg-blue-900/40 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase tracking-widest">
+                                {item.section?.title || item.section?.name}
+                              </div>
+                              <button 
+                                onClick={() => toggleFavorite(item.id)}
+                                className={`p-1 rounded-lg transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-pink' : 'text-gray-500 hover:text-white'}`}
+                              >
+                                <Star className={`w-4 h-4 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
+                              </button>
                             </div>
                           </div>
 
@@ -541,11 +549,19 @@ export default function UserDashboard() {
                   {filteredItems.map((item) => (
                     <div key={item.id} className="item-card-vertical !border-l-0 !p-8 !rounded-[40px] bg-[#1a1f35]/60 border border-white/10">
                       <div className="space-y-6">
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">NAME</p>
-                          <div className="inline-block px-6 py-2 rounded-2xl bg-neon-blue/10 border border-neon-blue/30">
-                            <h4 className="text-2xl font-black text-neon-blue">{item.title}</h4>
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-2">
+                            <p className="text-[10px] font-black text-neon-blue tracking-[0.2em] uppercase">NAME</p>
+                            <div className="inline-block px-6 py-2 rounded-2xl bg-neon-blue/10 border border-neon-blue/30">
+                              <h4 className="text-2xl font-black text-neon-blue">{item.title}</h4>
+                            </div>
                           </div>
+                          <button 
+                            onClick={() => toggleFavorite(item.id)}
+                            className={`p-3 rounded-2xl transition-all ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'text-neon-pink bg-neon-pink/10' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                          >
+                            <Star className={`w-6 h-6 ${favorites.some(f => f.item_id === item.id && f.user_id === user?.id) ? 'fill-current' : ''}`} />
+                          </button>
                         </div>
 
                         <div className="space-y-3">
