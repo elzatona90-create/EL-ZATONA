@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EL ZATONA">
-    <link rel="apple-touch-icon" href="/logo.png?v=4" />
-    <link rel="icon" type="image/png" href="/logo.png?v=4" />
+    <link rel="apple-touch-icon" href="/logo.jpg?v=4" />
+    <link rel="icon" type="image/jpeg" href="/logo.jpg?v=4" />
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
@@ -28,7 +28,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js?v=4')
+          navigator.serviceWorker.register('/sw.js')
             .then(reg => console.log('SW Registered', reg))
             .catch(err => console.log('SW Error', err));
         });
