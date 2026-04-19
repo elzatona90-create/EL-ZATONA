@@ -564,7 +564,12 @@ export default function AdminDashboard() {
                           >
                             <div className="flex items-center gap-4">
                               <span className="text-2xl">{section.emoji}</span>
-                              <span className="text-xl font-black tracking-tight">{section.title || section.name}</span>
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl font-black tracking-tight">{section.title || section.name}</span>
+                                <span className="px-2 py-0.5 rounded-lg bg-neon-blue/10 border border-neon-blue/20 text-[10px] font-black text-neon-blue">
+                                  {section.slug === 'prices' ? prices.length : items.filter(i => i.section_id === section.id).length}
+                                </span>
+                              </div>
                             </div>
                             <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-neon-blue" />
                           </button>
@@ -623,10 +628,15 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <h3 className="text-3xl font-black neon-text-blue flex items-center gap-4">
-                  <span>{sections.find(s => s.id === selectedSection)?.emoji}</span>
-                  {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
-                </h3>
+                <div className="flex items-center gap-4">
+                  <h3 className="text-3xl font-black neon-text-blue flex items-center gap-4">
+                    <span>{sections.find(s => s.id === selectedSection)?.emoji}</span>
+                    {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
+                  </h3>
+                  <span className="px-3 py-1 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-sm font-black text-neon-blue">
+                    {sections.find(s => s.id === selectedSection)?.slug === 'prices' ? prices.length : items.filter(i => i.section_id === selectedSection).length}
+                  </span>
+                </div>
 
                 {/* Special Logic for Prices Section */}
                 {sections.find(s => s.id === selectedSection)?.slug === 'prices' && (

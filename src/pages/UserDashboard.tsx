@@ -399,7 +399,12 @@ export default function UserDashboard() {
                     >
                       <div className="flex items-center gap-4">
                         <FileText className="w-5 h-5 text-neon-blue" />
-                        <span className="text-lg font-bold tracking-tight text-white">{section.title || section.name}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold tracking-tight text-white">{section.title || section.name}</span>
+                          <span className="px-2 py-0.5 rounded-lg bg-neon-blue/10 border border-neon-blue/20 text-[10px] font-black text-neon-blue">
+                            {section.slug === 'prices' ? prices.length : items.filter(i => i.section_id === section.id).length}
+                          </span>
+                        </div>
                       </div>
                       <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-neon-blue/20 transition-all">
                         <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-neon-blue" />
@@ -421,9 +426,14 @@ export default function UserDashboard() {
                   <div className="w-12 h-12 rounded-2xl bg-neon-blue/10 flex items-center justify-center border border-neon-blue/20">
                     <FileText className="w-6 h-6 text-neon-blue" />
                   </div>
-                  <h3 className="text-3xl font-black text-neon-blue tracking-tight">
-                    {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
-                  </h3>
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-3xl font-black text-neon-blue tracking-tight">
+                      {sections.find(s => s.id === selectedSection)?.title || sections.find(s => s.id === selectedSection)?.name}
+                    </h3>
+                    <span className="px-3 py-1 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-xs font-black text-neon-blue">
+                      {sections.find(s => s.id === selectedSection)?.slug === 'prices' ? prices.length : items.filter(i => i.section_id === selectedSection).length}
+                    </span>
+                  </div>
                 </div>
 
                 {sections.find(s => s.id === selectedSection)?.slug === 'prices' && (
