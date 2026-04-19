@@ -1,9 +1,9 @@
-const CACHE_NAME = 'el-zatona-v12';
+const CACHE_NAME = 'el-zatona-v20';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/logo.jpg',
+  '/logo.jpg?v=20',
   '/og-image.jpg'
 ];
 

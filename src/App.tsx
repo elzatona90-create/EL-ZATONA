@@ -29,14 +29,22 @@ export default function App() {
 
   useEffect(() => {
     const init = async () => {
-      // If we have a user, we MUST wait for data before showing dashboard
-      if (user) {
-        await fetchData();
+      try {
+        // If we have a user, we try to wait for data but continue anyway if it takes too long
+        if (user) {
+          // Promise.race to prevent infinite spinner if DB is slow/down
+          await Promise.race([
+            fetchData(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
+          ]).catch(err => console.error('Init Fetch Error:', err));
+        } else {
+          // If no user, fetch data in background
+          fetchData().catch(err => console.error('Background Fetch Error:', err));
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      } finally {
         setIsReady(true);
-      } else {
-        // If no user, show login immediately and fetch data in background
-        setIsReady(true);
-        fetchData(); 
       }
     };
     init();
