@@ -106,7 +106,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (isFetching) return;
 
     const now = Date.now();
-    const CACHE_DURATION = 5 * 60 * 1000; 
+    const CACHE_DURATION = 0; 
 
     if (!force && now - lastFetch < CACHE_DURATION && get().sections.length > 0) {
       return;
@@ -115,18 +115,40 @@ export const useStore = create<AppState>((set, get) => ({
     set({ isFetching: true });
 
     try {
+      const fetchAll = async (table: string) => {
+        let allData: any[] = [];
+        let from = 0;
+        const step = 500;
+        
+        while (true) {
+          const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .range(from, from + step - 1)
+            .order('id', { ascending: true });
+            
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          
+          allData = [...allData, ...data];
+          if (data.length < step) break;
+          from += step;
+        }
+        return allData;
+      };
+
       const [
         { data: sections },
-        { data: items },
-        { data: prices },
+        items,
+        prices,
         { data: favorites },
         { data: searchLogs },
         { data: attachments },
         { data: users }
       ] = await Promise.all([
         supabase.from('sections').select('*'),
-        supabase.from('items').select('*'),
-        supabase.from('prices').select('*'),
+        fetchAll('items'),
+        fetchAll('prices'),
         supabase.from('favorites').select('*'),
         supabase.from('search_logs').select('*'),
         supabase.from('attachments').select('*'),

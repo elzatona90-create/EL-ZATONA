@@ -142,9 +142,17 @@ export default function UserDashboard() {
               <h2 className="text-2xl font-black neon-text-blue tracking-tight">
                 Welcome Back, {user?.username}!
               </h2>
-              <p className="text-gray-400 font-medium tracking-tight text-sm">
-                Search through our exclusive database
-              </p>
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-gray-400 font-medium tracking-tight text-sm">
+                  Search through our exclusive database
+                </p>
+                <div className="flex items-center gap-2 opacity-40 hover:opacity-100 transition-opacity">
+                  <span className="w-1.5 h-1.5 rounded-full bg-neon-blue animate-pulse"></span>
+                  <span className="text-[10px] font-black text-neon-blue uppercase tracking-widest">
+                    SYNCED: {items.length} ITEMS & {prices.length} PRICES
+                  </span>
+                </div>
+              </div>
             </div>
 
             {deferredPrompt && (

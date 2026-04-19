@@ -34,12 +34,12 @@ export default function App() {
         if (user) {
           // Promise.race to prevent infinite spinner if DB is slow/down
           await Promise.race([
-            fetchData(),
+            fetchData(true),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
           ]).catch(err => console.error('Init Fetch Error:', err));
         } else {
           // If no user, fetch data in background
-          fetchData().catch(err => console.error('Background Fetch Error:', err));
+          fetchData(true).catch(err => console.error('Background Fetch Error:', err));
         }
       } catch (error) {
         console.error('Initialization error:', error);
