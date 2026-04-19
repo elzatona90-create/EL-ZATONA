@@ -119,6 +119,9 @@ export default function UserDashboard() {
     }
   };
 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+
   return (
     <Layout 
       activeTab={activeTab} 
@@ -162,6 +165,28 @@ export default function UserDashboard() {
                 </div>
                 <ChevronRight className="w-5 h-5 text-neon-pink group-hover:translate-x-1 transition-transform" />
               </motion.button>
+            )}
+
+            {isIOS && !isStandalone && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full glass-morphism p-5 rounded-[24px] border-2 border-neon-pink/50 space-y-3"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
+                    <LogOut className="w-5 h-5 text-neon-pink rotate-180" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-black text-white leading-none">INSTALL ON IPHONE</p>
+                    <p className="text-[8px] font-black text-neon-pink tracking-widest uppercase mt-1">Follow steps below</p>
+                  </div>
+                </div>
+                <div className="text-xs font-bold text-gray-300 space-y-2 bg-black/20 p-3 rounded-xl">
+                  <p className="flex items-center gap-2">1. اضغط على زر المشاركة <span className="inline-block p-1 bg-white/10 rounded">Share</span> في الأسفل</p>
+                  <p className="flex items-center gap-2">2. اختر "إضافة إلى الشاشة الرئيسية" <span className="text-neon-pink">Add to Home Screen</span></p>
+                </div>
+              </motion.div>
             )}
 
             {/* AI Search Assistant Card */}
