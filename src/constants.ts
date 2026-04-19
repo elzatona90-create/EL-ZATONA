@@ -6,7 +6,7 @@
 export const BRANDING = {
   // To update the logo, upload a file named 'logo.jpg' to the public directory
   // or change this URL to point to your hosted logo image.
-  logo_url: '/logo.jpg?v=3',
+  logo_url: '/logo.png?v=4',
   app_name: 'ELZATONA',
   design_by: 'ISLAM AL SAPAA',
   content_by: 'KIH',

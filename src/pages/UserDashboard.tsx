@@ -39,7 +39,9 @@ export default function UserDashboard() {
     theme,
     setTheme,
     language,
-    setLanguage
+    setLanguage,
+    deferredPrompt,
+    setDeferredPrompt
   } = useStore();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,14 +51,6 @@ export default function UserDashboard() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [sectionSearch, setSectionSearch] = useState('');
   const [profileUpdate, setProfileUpdate] = useState({ username: user?.username || '', password: '' });
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-
-  useEffect(() => {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    });
-  }, []);
 
   const handleInstall = async () => {
     if (deferredPrompt) {

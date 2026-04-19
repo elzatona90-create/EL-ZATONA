@@ -58,6 +58,8 @@ interface AppState {
   // UI
   setTheme: (theme: 'teal' | 'pink' | 'blue') => void;
   setLanguage: (lang: 'en' | 'ar') => void;
+  deferredPrompt: any | null;
+  setDeferredPrompt: (prompt: any) => void;
 }
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -403,7 +405,9 @@ export const useStore = create<AppState>((set, get) => ({
   setLanguage: (language) => {
     localStorage.setItem('el_zatona_lang', language);
     set({ language });
-  }
+  },
+  deferredPrompt: null,
+  setDeferredPrompt: (deferredPrompt) => set({ deferredPrompt })
 }));
 
 // Start sync interval

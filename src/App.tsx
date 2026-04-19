@@ -15,8 +15,17 @@ import UserDashboard from './pages/UserDashboard';
 
 export default function App() {
   const { i18n } = useTranslation();
-  const { user, fetchData } = useStore();
+  const { user, fetchData, setDeferredPrompt } = useStore();
   const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, [setDeferredPrompt]);
 
   useEffect(() => {
     const init = async () => {
