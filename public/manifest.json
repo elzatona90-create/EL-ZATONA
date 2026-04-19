@@ -3,7 +3,9 @@
   "short_name": "ELZATONA",
   "description": "El Zatona - Your Exclusive Knowledge Base",
   "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#020617",
   "theme_color": "#0066ff",
   "icons": [
@@ -26,6 +28,5 @@
       "purpose": "maskable"
     }
   ],
-  "id": "/",
-  "scope": "/"
+  "id": "/"
 }

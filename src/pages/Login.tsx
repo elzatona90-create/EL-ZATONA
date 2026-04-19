@@ -69,7 +69,6 @@ export default function Login() {
                   src={BRANDING.logo_url} 
                   alt="Logo" 
                   className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
                   onError={() => setImgError(true)}
                 />
               ) : (

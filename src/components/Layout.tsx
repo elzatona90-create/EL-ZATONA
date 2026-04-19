@@ -81,7 +81,6 @@ export default function Layout({
                 src={BRANDING.logo_url} 
                 alt="Logo" 
                 className="w-full h-full object-cover rounded-lg relative z-10"
-                referrerPolicy="no-referrer"
                 onError={() => setImgError(true)}
               />
             ) : (
